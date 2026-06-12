@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="googlebot" content="noindex,nofollow">
+<title>Sindicato dos Metalúrgicos de Pato Branco · Macroanalysis</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%237A1A1A'/%3E%3Crect x='6' y='6' width='52' height='52' fill='none' stroke='%23fff' stroke-width='1.6'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Courier New,monospace' font-weight='bold' font-size='38' fill='%23fff'%3EM%3C/text%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root {
+    --bg: #f1ede5;
+    --surface: #faf8f3;
+    --surface2: #ebe6db;
+    --border: #d8d2c4;
+    --border-soft: #e6e0d2;
+    --ink: #1a1917;
+    --ink2: #3f3d38;
+    --ink3: #6b6860;
+    --ink4: #9c9a94;
+    --wine: #7A1A1A;
+    --wine-dark: #5C1212;
+    --wine-mid: #9A3030;
+    --wine-soft: #C57878;
+    --wine-tint: #f4e6e3;
+    --gold: #b08a3e;
+    --pos: #4a6741;
+    --pos-tint: #e3ebdf;
+    --neg: #7A1A1A;
+    --neg-tint: #f4e0dc;
+    --radius: 4px;
+    --radius-lg: 6px;
+    --shadow-sm: 0 1px 2px rgba(26,25,23,0.04);
+    --shadow-md: 0 2px 8px rgba(26,25,23,0.05);
+    --sans: 'Inter', system-ui, sans-serif;
+    --mono: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body { font-family: var(--sans); color: var(--ink); min-height: 100vh; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    color: #fff;
+    padding: 22px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    border-bottom: 3px solid var(--wine);
+  }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .logo-m {
+    width: 58px; height: 58px;
+    background: var(--wine);
+    padding: 5px;
+    flex-shrink: 0;
+  }
+  .logo-frame {
+    width: 100%; height: 100%;
+    border: 1.5px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-letter {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 36px;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: 0;
+    margin-top: 0;
+  }
+  .logo-m.sm { width: 32px; height: 32px; padding: 3px; }
+  .logo-m.sm .logo-frame { border-width: 1px; }
+  .logo-m.sm .logo-letter { font-size: 21px; }
+  .brand-text { display: flex; flex-direction: column; gap: 2px; }
+  .brand-name {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+  .brand-tag {
+    font-family: var(--sans);
+    font-size: 10px;
+    color: #b8b4ac;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 2px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  /* REPORT TITLE */
+  .report-title {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 36px 30px;
+  }
+  .report-title h1 {
+    font-family: var(--sans);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .report-title h1::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 2px;
+    background: var(--wine);
+    margin-top: 14px;
+  }
+  .report-title .subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink3);
+    letter-spacing: 0.3px;
+    margin-top: 14px;
+  }
+
+  /* CONTAINER */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 36px; }
+  main.container { padding-top: 28px; padding-bottom: 60px; }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 28px;
+    border-radius: var(--radius);
+  }
+  .control-group { display: flex; align-items: center; gap: 9px; }
+  .control-group label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    white-space: nowrap;
+  }
+  .control-group select {
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 7px 30px 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6860' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center;
+    background-size: 10px;
+    color: var(--ink);
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .control-group select:focus { border-color: var(--wine); }
+
+  /* SECTION HEADING */
+  .section-h {
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .section-h::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--wine);
+    flex-shrink: 0;
+    transform: translateY(-2px);
+  }
+  .section-h .h-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--ink4);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-left: auto;
+  }
+
+  /* HIGHLIGHTS */
+  .hl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .hl-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hl-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--wine);
+  }
+  .hl-card.pos::before { background: var(--pos); }
+  .hl-card.neg::before { background: var(--neg); }
+  .hl-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 8px;
+  }
+  .hl-value {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .hl-meta {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink3);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  /* KPIS */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--kpi-color, var(--wine));
+  }
+  .kpi .lbl {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 8px;
+  }
+  .kpi .val {
+    font-family: var(--mono);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .kpi .sub {
+    font-size: 12px;
+    margin-top: 8px;
+    color: var(--ink3);
+    line-height: 1.4;
+  }
+  .kpi .sub.pos { color: var(--pos); font-weight: 500; }
+  .kpi .sub.neg { color: var(--neg); font-weight: 500; }
+  .kpi .spark {
+    margin-top: 10px;
+    height: 28px;
+    position: relative;
+  }
+
+  /* CHARTS */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+  }
+  .card.full { grid-column: 1 / -1; }
+  .card h3 {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.1px;
+  }
+  .card .card-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; font-family: var(--mono); }
+  .legend span { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink3); letter-spacing: 0.3px; }
+  .legend .dot { width: 10px; height: 10px; flex-shrink: 0; }
+
+  /* HEATMAP */
+  .heatmap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hm-row { display: flex; align-items: center; gap: 4px; }
+  .hm-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink3);
+    width: 42px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  .hm-cell {
+    flex: 1;
+    aspect-ratio: 1.6 / 1;
+    min-height: 38px;
+    border: 1px solid var(--border-soft);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: default;
+    transition: transform 0.15s;
+  }
+  .hm-cell:hover { transform: scale(1.06); z-index: 2; position: relative; }
+  .hm-cell.empty { background: var(--surface2); color: var(--ink4); }
+  .hm-header { display: flex; gap: 4px; padding-left: 46px; margin-bottom: 6px; }
+  .hm-header span {
+    flex: 1;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* RANKING */
+  .ranking { display: flex; flex-direction: column; gap: 10px; }
+  .rank-item { display: flex; align-items: center; gap: 14px; }
+  .rank-name {
+    font-size: 13px;
+    color: var(--ink2);
+    width: 280px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .rank-bar-wrap {
+    flex: 1;
+    height: 22px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .rank-bar {
+    height: 100%;
+    transition: width 0.5s ease;
+  }
+  .rank-val {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    width: 70px;
+    text-align: right;
+  }
+  .rank-val.pos { color: var(--pos); }
+  .rank-val.neg { color: var(--neg); }
+
+  /* ANALISES */
+  .analises-section { margin-bottom: 36px; }
+  .analises-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .analise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    border-left: 4px solid var(--setor-cor, var(--wine));
+  }
+  .setor-nome {
+    font-family: var(--sans);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+  }
+  .setor-nums { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .setor-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: var(--surface2);
+    color: var(--ink2);
+    border: 1px solid var(--border-soft);
+  }
+  .setor-pill.pos { background: var(--pos-tint); color: var(--pos); border-color: #c4d4bd; }
+  .setor-pill.neg { background: var(--neg-tint); color: var(--neg); border-color: #e5c0b8; }
+  .setor-texto { font-size: 13.5px; color: var(--ink2); line-height: 1.65; }
+  .setor-texto + .setor-texto { margin-top: 10px; color: var(--ink3); }
+
+  /* DATA TABLE */
+  .data-section { margin-bottom: 36px; }
+  .data-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .data-header .section-h { margin-bottom: 0; padding-bottom: 0; border: 0; flex: 1; }
+  .btn-export {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: var(--wine);
+    color: #fff;
+    border: 0;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-export:hover { background: var(--wine-dark); }
+  .btn-export + .btn-export { margin-left: 8px; background: var(--ink); }
+  .btn-export + .btn-export:hover { background: var(--ink2); }
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  thead {
+    position: sticky; top: 0;
+    background: var(--ink);
+    color: #fff;
+    z-index: 2;
+  }
+  th, td {
+    padding: 9px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+  th {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    border-bottom: 0;
+  }
+  th:first-child, td:first-child { text-align: left; }
+  td.pos { color: var(--pos); font-weight: 500; }
+  td.neg { color: var(--neg); font-weight: 500; }
+  tbody tr:hover { background: var(--surface2); }
+
+  /* FOOTER */
+  .footer {
+    background: var(--ink);
+    color: #cfccc4;
+    padding: 36px 0 28px;
+    margin-top: 40px;
+    border-top: 3px solid var(--wine);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1.6fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .footer-block .ft-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #807c73;
+    margin-bottom: 10px;
+  }
+  .footer-block .ft-content { font-size: 13px; color: #d8d4cc; line-height: 1.6; }
+  .footer-block .ft-content strong { color: #fff; font-weight: 600; }
+  .footer-block .ft-content + .ft-content { margin-top: 10px; }
+  .footer-brand-block { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
+  .footer-brand-line { display: flex; align-items: center; gap: 12px; }
+  .footer-brand-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+  }
+  .footer-brand-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: #807c73;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: right;
+  }
+  .footer-bottom {
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 1px solid #2c2a26;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #807c73;
+    letter-spacing: 0.5px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .kpis, .hl-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .card.full { grid-column: 1; }
+    .analises-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-brand-block { align-items: flex-start; }
+    .rank-name { width: 160px; }
+    .masthead { padding: 18px 24px; }
+    .report-title { padding: 28px 24px 22px; }
+    .report-title h1 { font-size: 28px; }
+    .container { padding: 0 20px; }
+  }
+  @media (max-width: 560px) {
+    .kpis, .hl-grid { grid-template-columns: 1fr; }
+    .brand-name { font-size: 20px; letter-spacing: 3px; }
+    .logo-m { width: 50px; height: 50px; }
+    .logo-letter { font-size: 32px; }
+    .hm-cell { min-height: 30px; font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="logo-m"><div class="logo-frame"><span class="logo-letter">M</span></div></div>
+    <div class="brand-text">
+      <div class="brand-name">MACROANALYSIS</div>
+      <div class="brand-tag">Centro de Inteligência Econômica</div>
+    </div>
+  </div>
+  <span class="badge" id="badgePeriodo">Jan/2024 – Mar/2026</span>
+</header>
+
+<section class="report-title">
+  <div class="container">
+    <h1>Sindicato dos Metalúrgicos de Pato Branco</h1>
+    <p class="subtitle">Indicadores do Mercado de Trabalho · 28 Municípios da Base Sindical</p>
+  </div>
+</section>
+
+<main class="container">
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Série</label>
+      <select id="selSerie" onchange="render()">
+        <option value="base">Base Sindicato Metalúrgicos</option>
+        <option value="transf">Indústria de Transformação</option>
+        <option value="mun">Total dos Municípios</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Ano</label>
+      <select id="selAno" onchange="onAnoChange()">
+        <option value="todos">Todos (2024–2026)</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+      </select>
+    </div>
+    <div class="control-group" id="grpMes" style="display:none">
+      <label>Mês</label>
+      <select id="selMes" onchange="render()">
+        <option value="todos">Todos os meses</option>
+      </select>
+    </div>
+  </div>
+
+  <section style="margin-bottom: 28px">
+    <h2 class="section-h">Resumo do Período <span class="h-sub" id="hSubPeriodo">jan/2024 – fev/2026</span></h2>
+    <div class="hl-grid" id="hlGrid"></div>
+  </section>
+
+  <section style="margin-bottom: 28px">
+    <h2 class="section-h">Indicadores Principais</h2>
+    <div class="kpis" id="kpiRow"></div>
+  </section>
+
+  <section style="margin-bottom: 36px">
+    <h2 class="section-h">Evolução Mensal</h2>
+    <div class="charts-grid">
+      <div class="card full">
+        <h3>Admitidos vs Desligados</h3>
+        <p class="card-sub">Movimentação mensal de empregos formais</p>
+        <div class="legend">
+          <span><span class="dot" style="background:#1a1917"></span>Admitidos</span>
+          <span><span class="dot" style="background:#7A1A1A"></span>Desligados</span>
+        </div>
+        <div style="position:relative;height:260px"><canvas id="cAdmDes" role="img"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Saldo Mensal</h3>
+        <p class="card-sub">Admissões menos desligamentos</p>
+        <div style="position:relative;height:220px"><canvas id="cSaldo" role="img"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Estoque de Empregos</h3>
+        <p class="card-sub">Evolução do total de postos formais</p>
+        <div style="position:relative;height:220px"><canvas id="cEstoque" role="img"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 36px">
+    <h2 class="section-h">Comparativo Ano a Ano</h2>
+    <div class="charts-grid">
+      <div class="card full">
+        <h3>Saldo Mensal · 2024 vs 2025 vs 2026</h3>
+        <p class="card-sub">Comparação mês a mês entre os anos disponíveis</p>
+        <div class="legend">
+          <span><span class="dot" style="background:#9c9a94"></span>2024</span>
+          <span><span class="dot" style="background:#9A3030"></span>2025</span>
+          <span><span class="dot" style="background:#7A1A1A"></span>2026</span>
+        </div>
+        <div style="position:relative;height:280px"><canvas id="cYoY" role="img"></canvas></div>
+      </div>
+      <div class="card full">
+        <h3>Mapa de Calor · Saldo Mensal</h3>
+        <p class="card-sub">Intensidade do saldo em cada mês ao longo dos anos</p>
+        <div class="hm-header">
+          <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span>
+          <span>Jul</span><span>Ago</span><span>Set</span><span>Out</span><span>Nov</span><span>Dez</span>
+        </div>
+        <div class="heatmap" id="heatmap"></div>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px">
+          <span>Saldo:</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#7A1A1A;display:inline-block;border-radius:2px"></span>Negativo</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#ebe6db;display:inline-block;border-radius:2px;border:1px solid #d8d2c4"></span>Neutro</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#4a6741;display:inline-block;border-radius:2px"></span>Positivo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 36px">
+    <h2 class="section-h">Ranking de Categorias</h2>
+    <div class="card full">
+      <h3>Saldo Acumulado por Setor no Período</h3>
+      <p class="card-sub">Posições ordenadas do maior ao menor saldo</p>
+      <div id="rankingDiv" class="ranking" style="margin-top:6px"></div>
+    </div>
+  </section>
+
+  <section class="analises-section">
+    <h2 class="section-h">Análise por Setor</h2>
+    <div class="analises-grid" id="analisesGrid"></div>
+  </section>
+
+  <section class="data-section">
+    <div class="data-header">
+      <h2 class="section-h" style="border:0;padding-bottom:0;margin-bottom:0">Tabela de Dados</h2>
+      <div>
+        <button id="btnPDF" class="btn-export" onclick="exportPDF()">Baixar Relatório PDF</button>
+        <button id="btnExcel" class="btn-export" onclick="exportExcel()">Baixar Excel</button>
+        <button id="btnCSV" class="btn-export" onclick="exportCSV()">Baixar CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="dataTable"></table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-block">
+        <div class="ft-label">Metodologia</div>
+        <div class="ft-content"><strong>Estatísticas oficiais do mercado de trabalho formal</strong><br>Apuração mensal · 28 Municípios da Base Sindical<br>8 Grupamentos CNAE da metalurgia e indústria</div>
+      </div>
+      <div class="footer-block">
+        <div class="ft-label">Levantamento e Análise</div>
+        <div class="ft-content"><strong>Cid Cordeiro Silva</strong><br>Economista · Assessor Econômico do Sindicato dos Metalúrgicos de Pato Branco</div>
+        <div class="ft-content"><strong>Carolina Cordeiro Silva</strong><br>Soluções em IA</div>
+      </div>
+      <div class="footer-block footer-brand-block">
+        <div class="footer-brand-line">
+          <div class="logo-m sm"><div class="logo-frame"><span class="logo-letter">M</span></div></div>
+          <span class="footer-brand-name">MACROANALYSIS</span>
+        </div>
+        <div class="footer-brand-tag">Centro de Inteligência Econômica</div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="ftYear"></span> Macroanalysis · Todos os direitos reservados</span>
+      <span id="ftUpdated">Última atualização: —</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+let RAW = [];
+let SETORES = [];
+let MESES = {};
+let MES_ORDEM = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let charts = {};
+
+function fmt(v){ return (v>=0?'+':'')+Number(v).toLocaleString('pt-BR'); }
+function fmtN(v){ return Number(v).toLocaleString('pt-BR'); }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function onAnoChange(){
+  const ano = document.getElementById('selAno').value;
+  const grp = document.getElementById('grpMes');
+  const sel = document.getElementById('selMes');
+  sel.innerHTML = '<option value="todos">Todos os meses</option>';
+  if(ano !== 'todos'){
+    grp.style.display = 'flex';
+    (MESES[ano]||[]).forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o); });
+  } else {
+    grp.style.display = 'none';
+  }
+  render();
+}
+
+function getFiltered(){
+  const ano = document.getElementById('selAno').value;
+  const mes = document.getElementById('selMes').value;
+  let data = RAW;
+  if(ano!=='todos'){ data=data.filter(r=>r.ano===ano); if(mes!=='todos') data=data.filter(r=>r.mes===mes); }
+  return data;
+}
+
+function render(){
+  const data = getFiltered();
+  if(!data.length) return;
+  const ser = document.getElementById('selSerie').value;
+  const pk = ser==='base'?'b': ser==='transf'?'t':'m';
+  const ano = document.getElementById('selAno').value;
+  const mes = document.getElementById('selMes').value;
+
+  const first=data[0].m, last=data[data.length-1].m;
+  const periodoTxt = first===last? first : first+' – '+last;
+  document.getElementById('badgePeriodo').textContent = periodoTxt;
+  document.getElementById('hSubPeriodo').textContent = periodoTxt;
+
+  const labels=data.map(r=>r.m);
+  const adm=data.map(r=>r['adm_'+pk]);
+  const des=data.map(r=>r['des_'+pk]);
+  const sal=data.map(r=>r['sal_'+pk]);
+  const est=data.map(r=>r['est_'+pk]);
+  const totAdm=adm.reduce((a,b)=>a+b,0);
+  const totDes=des.reduce((a,b)=>a+b,0);
+  const totSal=sal.reduce((a,b)=>a+b,0);
+  const lastEst=est[est.length-1]||0;
+  const saldoPos=sal.filter(v=>v>0).length;
+  const serLabel=ser==='base'?'Base Sindicato':ser==='transf'?'Ind. Transformação':'Total Municípios';
+
+  // Highlights
+  let bestIdx=0, worstIdx=0;
+  sal.forEach((v,i)=>{ if(v>sal[bestIdx]) bestIdx=i; if(v<sal[worstIdx]) worstIdx=i; });
+  const setoresAgg = SETORES.map(s=>{
+    const ts=data.reduce((acc,r)=>acc+(r.cats[s.key]?.s||0),0);
+    return {...s, ts};
+  });
+  setoresAgg.sort((a,b)=>b.ts-a.ts);
+  const topSetor = setoresAgg[0];
+  const botSetor = setoresAgg[setoresAgg.length-1];
+
+  document.getElementById('hlGrid').innerHTML = `
+    <div class="hl-card pos">
+      <div class="hl-label">Melhor mês</div>
+      <div class="hl-value">${fmt(sal[bestIdx])}</div>
+      <div class="hl-meta">${data[bestIdx].mes}/${data[bestIdx].ano.slice(2)} · saldo de empregos</div>
+    </div>
+    <div class="hl-card neg">
+      <div class="hl-label">Pior mês</div>
+      <div class="hl-value">${fmt(sal[worstIdx])}</div>
+      <div class="hl-meta">${data[worstIdx].mes}/${data[worstIdx].ano.slice(2)} · saldo de empregos</div>
+    </div>
+    <div class="hl-card ${topSetor.ts>=0?'pos':'neg'}">
+      <div class="hl-label">Setor destaque</div>
+      <div class="hl-value">${fmt(topSetor.ts)}</div>
+      <div class="hl-meta">${topSetor.nome.replace(/^Fabricação de /i,'').slice(0,42)}${topSetor.nome.length>42?'…':''}</div>
+    </div>
+    <div class="hl-card ${botSetor.ts>=0?'pos':'neg'}">
+      <div class="hl-label">Maior retração</div>
+      <div class="hl-value">${fmt(botSetor.ts)}</div>
+      <div class="hl-meta">${botSetor.nome.replace(/^Fabricação de /i,'').slice(0,42)}${botSetor.nome.length>42?'…':''}</div>
+    </div>
+  `;
+
+  // KPI cards
+  document.getElementById('kpiRow').innerHTML=`
+    <div class="kpi" style="--kpi-color:#1a1917"><div class="lbl">Total Admitidos</div><div class="val">${fmtN(totAdm)}</div><div class="sub">${serLabel} · ${data.length} ${data.length===1?'mês':'meses'}</div></div>
+    <div class="kpi" style="--kpi-color:#7A1A1A"><div class="lbl">Total Desligados</div><div class="val">${fmtN(totDes)}</div><div class="sub">${serLabel} · ${data.length} ${data.length===1?'mês':'meses'}</div></div>
+    <div class="kpi" style="--kpi-color:${totSal>=0?'#4a6741':'#7A1A1A'}"><div class="lbl">Saldo Acumulado</div><div class="val">${fmt(totSal)}</div><div class="sub ${totSal>=0?'pos':'neg'}">${totSal>=0?'▲ saldo positivo':'▼ saldo negativo'}</div></div>
+    <div class="kpi" style="--kpi-color:#1a1917"><div class="lbl">Estoque (último mês)</div><div class="val">${fmtN(lastEst)}</div><div class="sub">${saldoPos} de ${data.length} ${data.length===1?'mês':'meses'} c/ saldo positivo</div></div>
+  `;
+
+  // Charts
+  const tf={size:10,family:"'Courier Prime',monospace",color:'#6b6860'}, gc='#e6e0d2', ask=data.length>18;
+  const opt = (extra={}) => ({
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#1a1917', titleFont:{family:"'Inter'",size:12,weight:'600'}, bodyFont:{family:"'Courier Prime'",size:12}, padding:10, borderColor:'#7A1A1A', borderWidth:1 } },
+    scales:{
+      x:{ ticks:{font:tf,maxRotation:45,autoSkip:ask,color:'#6b6860'}, grid:{color:gc,drawBorder:false} },
+      y:{ ticks:{font:tf,color:'#6b6860'}, grid:{color:gc,drawBorder:false} }
+    },
+    ...extra
+  });
+
+  mkChart('cAdmDes','bar',{labels,datasets:[
+    {label:'Admitidos',data:adm,backgroundColor:'#1a1917',borderRadius:2,categoryPercentage:0.8,barPercentage:0.85},
+    {label:'Desligados',data:des,backgroundColor:'#7A1A1A',borderRadius:2,categoryPercentage:0.8,barPercentage:0.85}
+  ]},opt());
+
+  mkChart('cSaldo','bar',{labels,datasets:[{label:'Saldo',data:sal,backgroundColor:sal.map(v=>v>=0?'#4a6741':'#7A1A1A'),borderRadius:2}]},opt());
+
+  mkChart('cEstoque','line',{labels,datasets:[{label:'Estoque',data:est,borderColor:'#7A1A1A',backgroundColor:'rgba(122,26,26,0.08)',tension:0.35,pointRadius:3,pointBackgroundColor:'#7A1A1A',pointBorderColor:'#fff',pointBorderWidth:1.5,fill:true,borderWidth:2}]},
+    opt({scales:{x:{ticks:{font:tf,maxRotation:45,autoSkip:ask,color:'#6b6860'},grid:{color:gc}},y:{ticks:{font:tf,color:'#6b6860',callback:v=>v.toLocaleString('pt-BR')},grid:{color:gc}}}}));
+
+  // YoY chart
+  const yoyData = {};
+  ['2024','2025','2026'].forEach(a=>{ yoyData[a]=new Array(12).fill(null); });
+  RAW.forEach(r=>{
+    const mIdx = MES_ORDEM.indexOf(r.mes);
+    if(mIdx>=0 && yoyData[r.ano]) yoyData[r.ano][mIdx]=r['sal_'+pk];
+  });
+  const yoyColors={'2024':'#9c9a94','2025':'#9A3030','2026':'#7A1A1A'};
+  mkChart('cYoY','bar',{
+    labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+    datasets:[
+      {label:'2024',data:yoyData['2024'],backgroundColor:yoyColors['2024'],borderRadius:2,categoryPercentage:0.85,barPercentage:0.85},
+      {label:'2025',data:yoyData['2025'],backgroundColor:yoyColors['2025'],borderRadius:2,categoryPercentage:0.85,barPercentage:0.85},
+      {label:'2026',data:yoyData['2026'],backgroundColor:yoyColors['2026'],borderRadius:2,categoryPercentage:0.85,barPercentage:0.85}
+    ]
+  },opt());
+
+  // Heatmap
+  const allYears = ['2024','2025','2026'];
+  let allVals = [];
+  RAW.forEach(r=>allVals.push(r['sal_'+pk]));
+  const maxAbsHM = Math.max(...allVals.map(v=>Math.abs(v)),1);
+  const hmHtml = allYears.map(yr=>{
+    const cells = MES_ORDEM.map(m=>{
+      const rec = RAW.find(r=>r.ano===yr && r.mes===m);
+      if(!rec) return `<div class="hm-cell empty">—</div>`;
+      const v = rec['sal_'+pk];
+      const intensity = Math.min(Math.abs(v)/maxAbsHM, 1);
+      let bg, color;
+      if(v>0){
+        const alpha = 0.15 + intensity*0.75;
+        bg = `rgba(74,103,65,${alpha})`;
+        color = intensity > 0.5 ? '#fff' : '#1a1917';
+      } else if(v<0){
+        const alpha = 0.15 + intensity*0.75;
+        bg = `rgba(122,26,26,${alpha})`;
+        color = intensity > 0.5 ? '#fff' : '#1a1917';
+      } else {
+        bg = '#ebe6db'; color = '#6b6860';
+      }
+      const tip = `${m} ${yr}: ${fmt(v)}`;
+      return `<div class="hm-cell" style="background:${bg};color:${color}" title="${tip}">${fmt(v)}</div>`;
+    }).join('');
+    return `<div class="hm-row"><span class="hm-year">${yr}</span>${cells}</div>`;
+  }).join('');
+  document.getElementById('heatmap').innerHTML = hmHtml;
+
+  // Ranking
+  const rankData = SETORES.map(s=>{
+    const ta=data.reduce((acc,r)=>acc+(r.cats[s.key]?.a||0),0);
+    const td=data.reduce((acc,r)=>acc+(r.cats[s.key]?.d||0),0);
+    const ts=data.reduce((acc,r)=>acc+(r.cats[s.key]?.s||0),0);
+    const le=data[data.length-1]?.cats[s.key]?.e||0;
+    return{...s,ta,td,ts,le};
+  }).sort((a,b)=>b.ts-a.ts);
+  const maxAbs=Math.max(...rankData.map(r=>Math.abs(r.ts)),1);
+  document.getElementById('rankingDiv').innerHTML=rankData.map(r=>{
+    const p=Math.abs(r.ts)/maxAbs*100, cor=r.ts>=0?'#4a6741':'#7A1A1A';
+    return`<div class="rank-item"><span class="rank-name" title="${r.nome}">${r.nome.replace(/^Fabricação de /i,'')}</span><div class="rank-bar-wrap"><div class="rank-bar" style="width:${p.toFixed(1)}%;background:${cor}"></div></div><span class="rank-val ${r.ts>=0?'pos':'neg'}">${fmt(r.ts)}</span></div>`;
+  }).join('');
+
+  const pLabel = ano==='todos'? 'no período completo (jan/2024 a fev/2026)' :
+    (mes!=='todos'? `em ${mes.toLowerCase()} de ${ano}` : `no ano de ${ano}`);
+
+  document.getElementById('analisesGrid').innerHTML=rankData.map(s=>{
+    const tendVerb = s.ts>0?'saldo positivo':s.ts<0?'saldo negativo':'saldo neutro';
+    const tendAdj  = s.ts>0?'crescimento':s.ts<0?'retração':'estabilidade';
+    const txt1 = `O setor registrou <strong>${tendVerb} de ${fmt(s.ts)} posto${Math.abs(s.ts)!==1?'s':''}</strong> de trabalho ${pLabel}, com ${fmtN(s.ta)} admissões e ${fmtN(s.td)} desligamentos. O estoque encerrou em <strong>${fmtN(s.le)} trabalhadores</strong>, indicando <strong>${tendAdj}</strong> no nível de emprego.`;
+    return`<div class="analise-card" style="--setor-cor:${s.cor}">
+      <div class="setor-nome">${s.nome}</div>
+      <div class="setor-nums">
+        <span class="setor-pill">Adm: ${fmtN(s.ta)}</span>
+        <span class="setor-pill">Des: ${fmtN(s.td)}</span>
+        <span class="setor-pill ${s.ts>=0?'pos':'neg'}">Saldo: ${fmt(s.ts)}</span>
+        <span class="setor-pill">Estoque: ${fmtN(s.le)}</span>
+      </div>
+      <p class="setor-texto">${txt1}</p>
+      <p class="setor-texto">${s.desc}</p>
+    </div>`;
+  }).join('');
+
+  // Tabela
+  const tableEl = document.getElementById('dataTable');
+  const head = `<thead><tr>
+    <th>Período</th>
+    <th>Admitidos</th>
+    <th>Desligados</th>
+    <th>Saldo</th>
+    <th>Estoque</th>
+  </tr></thead>`;
+  const body = `<tbody>${data.map(r=>{
+    const s = r['sal_'+pk];
+    return `<tr><td>${r.mes}/${r.ano}</td><td>${fmtN(r['adm_'+pk])}</td><td>${fmtN(r['des_'+pk])}</td><td class="${s>=0?'pos':'neg'}">${fmt(s)}</td><td>${fmtN(r['est_'+pk])}</td></tr>`;
+  }).join('')}</tbody>`;
+  tableEl.innerHTML = head + body;
+}
+
+function mkChart(id,type,data,options){
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{type,data,options});
+}
+
+const SETORES_RELATORIO = [
+  { key: 'info',    nome: 'Fabricação de Equipamentos de Informática, Produtos Eletrônicos e Ópticos' },
+  { key: 'maq',     nome: 'Fabricação de máquinas e Equipamentos' },
+  { key: 'ele',     nome: 'Fabricação de máquinas, aparelhos e materiais Elétricos' },
+  { key: 'tran',    nome: 'Fabricação de outros equipamentos de transporte, exceto Veículos Automotores' },
+  { key: 'metal_p', nome: 'Fabricação de Produtos de Metal, Exceto Máquinas e Equipamentos' },
+  { key: 'veic',    nome: 'Fabricação de veículos Automotores, Reboques e Carrocerias' },
+  { key: 'manut',   nome: 'Manutenção, Reparação e Instalação de Máquinas e Equipamentos' },
+  { key: 'metlg',   nome: 'Metalúrgica' },
+];
+
+const SETORES_MAP_CURTO = {
+  metlg:   'Metalurgia',
+  metal_p: 'Produtos de Metal',
+  maq:     'Máquinas e Equipamentos',
+  ele:     'Materiais Elétricos',
+  manut:   'Manutenção de Máquinas',
+  info:    'Informática e Eletrônicos',
+  veic:    'Veículos Automotores',
+  tran:    'Outros Equipamentos de Transporte',
+};
+
+function variacaoPct(saldo, estoque){
+  const anterior = estoque - saldo;
+  if (anterior === 0) return 0;
+  return saldo / anterior;
+}
+
+function montarRelatorioMensal(r){
+  const tituloMes = `Mensal : ${r.mes.toLowerCase()} de ${r.ano}`;
+  const cabecalho = ['Descrição', 'ADMISSOES', 'DESLIGAMENTO', 'SALDO', 'ESTOQUE', 'Variação %'];
+
+  const linhas = [
+    ['', '', '', '', '', tituloMes],
+    cabecalho,
+    ['Total dos municípios',                  r.adm_m, r.des_m, r.sal_m, r.est_m, variacaoPct(r.sal_m, r.est_m)],
+    ['Total da Indústria de Transformação',   r.adm_t, r.des_t, r.sal_t, r.est_t, variacaoPct(r.sal_t, r.est_t)],
+    ['Total Base Sindicato Metalúrgicos',     r.adm_b, r.des_b, r.sal_b, r.est_b, variacaoPct(r.sal_b, r.est_b)],
+  ];
+
+  for (const s of SETORES_RELATORIO) {
+    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
+    linhas.push([s.nome, c.a, c.d, c.s, c.e, variacaoPct(c.s, c.e)]);
+  }
+  return linhas;
+}
+
+function aplicarFormatoPercentual(ws, colunaPctIdx, linhaInicio, linhaFim){
+  for (let R = linhaInicio; R <= linhaFim; R++) {
+    const addr = XLSX.utils.encode_cell({r: R, c: colunaPctIdx});
+    const cell = ws[addr];
+    if (cell && cell.v !== undefined) {
+      cell.t = 'n';
+      cell.z = '0.00%';
+    }
+  }
+}
+
+const NOME_MES_NUM = {
+  Janeiro:1, Fevereiro:2, Março:3, Abril:4, Maio:5, Junho:6,
+  Julho:7, Agosto:8, Setembro:9, Outubro:10, Novembro:11, Dezembro:12,
+};
+
+function nomeAbaMes(r){
+  const mm = String(NOME_MES_NUM[r.mes] || 0).padStart(2, '0');
+  return `${mm}-${r.ano}`;
+}
+
+function montarLinhaCompleta(r){
+  const row = {
+    'Mês': r.mes,
+    'Ano': r.ano,
+    'Total dos municípios (Adm)': r.adm_m,
+    'Total dos municípios (Des)': r.des_m,
+    'Total dos municípios (Saldo)': r.sal_m,
+    'Total dos municípios (Estoque)': r.est_m,
+    'Total dos municípios (Var %)': variacaoPct(r.sal_m, r.est_m),
+    'Total Ind. Transformação (Adm)': r.adm_t,
+    'Total Ind. Transformação (Des)': r.des_t,
+    'Total Ind. Transformação (Saldo)': r.sal_t,
+    'Total Ind. Transformação (Estoque)': r.est_t,
+    'Total Ind. Transformação (Var %)': variacaoPct(r.sal_t, r.est_t),
+    'Total Base Sindicato (Adm)': r.adm_b,
+    'Total Base Sindicato (Des)': r.des_b,
+    'Total Base Sindicato (Saldo)': r.sal_b,
+    'Total Base Sindicato (Estoque)': r.est_b,
+    'Total Base Sindicato (Var %)': variacaoPct(r.sal_b, r.est_b),
+  };
+  for (const s of SETORES_RELATORIO) {
+    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
+    row[s.nome + ' (Adm)'] = c.a;
+    row[s.nome + ' (Des)'] = c.d;
+    row[s.nome + ' (Saldo)'] = c.s;
+    row[s.nome + ' (Estoque)'] = c.e;
+    row[s.nome + ' (Var %)'] = variacaoPct(c.s, c.e);
+  }
+  return row;
+}
+
+function exportCSV(){
+  const data = getFiltered();
+  if (!data.length) return;
+  const bloco = (r) => {
+    const linhas = montarRelatorioMensal(r);
+    return linhas.map(l => l.map(v => typeof v === 'number' ? v.toString().replace('.', ',') : v).join(';')).join('\n');
+  };
+  const csv = data.map(bloco).join('\n\n');
+  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio_sindmetal_pb_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportExcel(){
+  const data = getFiltered();
+  if (!data.length) return;
+
+  const wb = XLSX.utils.book_new();
+
+  for (const r of data) {
+    const linhas = montarRelatorioMensal(r);
+    const ws = XLSX.utils.aoa_to_sheet(linhas);
+    ws['!cols'] = [{wch: 70}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 11}, {wch: 11}];
+    aplicarFormatoPercentual(ws, 5, 2, linhas.length - 1);
+    XLSX.utils.book_append_sheet(wb, ws, nomeAbaMes(r));
+  }
+
+  const resumoCompleto = data.map(montarLinhaCompleta);
+  const wsResumo = XLSX.utils.json_to_sheet(resumoCompleto);
+  const colNames = Object.keys(resumoCompleto[0] || {});
+  colNames.forEach((c, idx) => {
+    if (c.includes('(Var %)')) {
+      aplicarFormatoPercentual(wsResumo, idx, 1, resumoCompleto.length);
+    }
+  });
+  XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo Completo');
+
+  XLSX.writeFile(wb, `relatorio_sindmetal_pb_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function fmtPct(v){
+  return ((v >= 0 ? '+' : '') + (v * 100).toFixed(2).replace('.', ',') + '%');
+}
+
+const MUNICIPIOS_BASE = [
+  'Ampere', 'Barracão', 'Capanema', 'Chopinzinho', 'Clevelândia',
+  'Coronel Vivida', 'Dois Vizinhos', 'Francisco Beltrão', "Itapejara D'Oeste",
+  'Mangueirinha', 'Mariópolis', 'Marmeleiro', 'Nova Prata do Iguaçu',
+  'Palmas', 'Pato Branco', "Pérola D'Oeste", 'Planalto', 'Pranchita',
+  'Realeza', 'Renascença', 'Salgado Filho', 'Salto do Lontra',
+  "Santa Izabel D'Oeste", 'Santo Antônio do Sudoeste', 'São João',
+  "São Jorge D'Oeste", 'Verê', 'Vitorino'
+];
+
+function exportPDF(){
+  const data = getFiltered();
+  if (!data.length) return;
+  const r = data[data.length - 1];
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit: 'mm', format: 'a4'});
+
+  const WINE = [122, 26, 26];
+  const INK = [26, 25, 23];
+  const INK2 = [63, 61, 56];
+  const INK3 = [107, 104, 96];
+  const MUTED = [156, 154, 148];
+  const WHITE = [255, 255, 255];
+
+  function cabecalho(){
+    doc.setFillColor(...INK);
+    doc.rect(0, 0, 210, 22, 'F');
+    doc.setFillColor(...WINE);
+    doc.rect(15, 5.5, 11, 11, 'F');
+    doc.setDrawColor(...WHITE);
+    doc.setLineWidth(0.25);
+    doc.rect(16.3, 6.8, 8.4, 8.4);
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...WHITE);
+    doc.text('M', 20.5, 13.2, {align: 'center'});
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(11);
+    doc.text('MACROANALYSIS', 30, 10.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(184, 180, 172);
+    doc.text('CENTRO DE INTELIGÊNCIA ECONÔMICA', 30, 14.5);
+    doc.setFillColor(...WINE);
+    doc.rect(0, 22, 210, 0.8, 'F');
+  }
+
+  function rodape(){
+    const pages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      doc.setDrawColor(216, 210, 196);
+      doc.setLineWidth(0.2);
+      doc.line(15, 285, 195, 285);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text('Cid Cordeiro Silva (Economista) · Carolina Cordeiro Silva (Soluções em IA) · Macroanalysis', 15, 288.5);
+      doc.text(`Página ${i} de ${pages}`, 195, 288.5, {align: 'right'});
+    }
+  }
+
+  cabecalho();
+
+  let y = 28;
+  doc.setTextColor(...INK);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('Sindicato dos Metalúrgicos de Pato Branco', 15, y);
+  y += 4.5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(...WINE);
+  doc.text(`Relatório Mensal · ${r.mes} de ${r.ano}`, 15, y);
+  y += 4;
+  doc.setFontSize(7.5);
+  doc.setTextColor(...INK3);
+  doc.text('28 Municípios da Base Sindical · 8 Grupamentos CNAE', 15, y);
+  y += 5.5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(...INK2);
+  const muniText = MUNICIPIOS_BASE.join(' · ');
+  const muniLines = doc.splitTextToSize(muniText, 173);
+  const boxH = 4 + muniLines.length * 3 + 2;
+  doc.setFillColor(244, 230, 227);
+  doc.rect(15, y, 180, boxH, 'F');
+  doc.setFillColor(...WINE);
+  doc.rect(15, y, 1.2, boxH, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...WINE);
+  doc.text('MUNICÍPIOS DA BASE SINDICAL (28)', 18, y + 3.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(...INK2);
+  doc.text(muniLines, 18, y + 7);
+  y += boxH + 4;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...WINE);
+  doc.text('SUMÁRIO EXECUTIVO', 15, y);
+  doc.setDrawColor(...WINE);
+  doc.setLineWidth(0.35);
+  doc.line(15, y+1, 55, y+1);
+  y += 4.5;
+
+  const setoresOrd = SETORES.map(s => ({...s, ts: r.cats[s.key]?.s || 0}));
+  setoresOrd.sort((a,b) => b.ts - a.ts);
+  const top = setoresOrd[0];
+  const bot = setoresOrd[setoresOrd.length - 1];
+
+  const items = [
+    `Saldo geral dos 28 municípios: ${fmt(r.sal_m)} postos (estoque ${fmtN(r.est_m)}).`,
+    `Indústria de Transformação na base: ${fmt(r.sal_t)} postos (estoque ${fmtN(r.est_t)}, ${fmtPct(variacaoPct(r.sal_t, r.est_t))}).`,
+    `Base Sindicato Metalúrgicos: ${fmt(r.sal_b)} postos (estoque ${fmtN(r.est_b)}, ${fmtPct(variacaoPct(r.sal_b, r.est_b))}).`,
+    `Destaque positivo: ${top.nome} (${fmt(top.ts)} postos). Maior retração: ${bot.nome} (${fmt(bot.ts)} postos).`,
+  ];
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...INK);
+  for (const t of items) {
+    const lines = doc.splitTextToSize(t, 175);
+    doc.setFillColor(...WINE);
+    doc.circle(17, y - 1, 0.6, 'F');
+    doc.text(lines, 20, y);
+    y += lines.length * 3.5 + 0.5;
+  }
+  y += 2;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...WINE);
+  doc.text('TABELA CONSOLIDADA', 15, y);
+  doc.setDrawColor(...WINE);
+  doc.line(15, y+1, 58, y+1);
+  y += 2.5;
+
+  const tableBody = [
+    ['Total dos municípios', fmtN(r.adm_m), fmtN(r.des_m), fmt(r.sal_m), fmtN(r.est_m), fmtPct(variacaoPct(r.sal_m, r.est_m))],
+    ['Total da Indústria de Transformação', fmtN(r.adm_t), fmtN(r.des_t), fmt(r.sal_t), fmtN(r.est_t), fmtPct(variacaoPct(r.sal_t, r.est_t))],
+    ['Total Base Sindicato Metalúrgicos', fmtN(r.adm_b), fmtN(r.des_b), fmt(r.sal_b), fmtN(r.est_b), fmtPct(variacaoPct(r.sal_b, r.est_b))],
+  ];
+  for (const s of SETORES_RELATORIO) {
+    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
+    tableBody.push([s.nome, fmtN(c.a), fmtN(c.d), fmt(c.s), fmtN(c.e), fmtPct(variacaoPct(c.s, c.e))]);
+  }
+
+  doc.autoTable({
+    startY: y,
+    head: [['Descrição', 'Admissões', 'Desligamentos', 'Saldo', 'Estoque', 'Variação %']],
+    body: tableBody,
+    styles: {font: 'helvetica', fontSize: 6.8, cellPadding: 1.3, lineColor: [216, 210, 196], lineWidth: 0.1},
+    headStyles: {fillColor: INK, textColor: WHITE, fontStyle: 'bold', halign: 'center', fontSize: 6.8},
+    columnStyles: {
+      0: {cellWidth: 78},
+      1: {halign: 'right', cellWidth: 21},
+      2: {halign: 'right', cellWidth: 24},
+      3: {halign: 'right', fontStyle: 'bold', cellWidth: 18},
+      4: {halign: 'right', cellWidth: 21},
+      5: {halign: 'right', cellWidth: 19},
+    },
+    didParseCell: (d) => {
+      if (d.section === 'body' && d.row.index === 2) {
+        d.cell.styles.fontStyle = 'bold';
+        d.cell.styles.fillColor = [244, 230, 227];
+      }
+      if (d.section === 'body' && d.column.index === 3 && typeof d.cell.raw === 'string') {
+        if (d.cell.raw.startsWith('+')) d.cell.styles.textColor = [74, 103, 65];
+        else if (d.cell.raw.startsWith('-')) d.cell.styles.textColor = WINE;
+      }
+      if (d.section === 'body' && d.column.index === 5 && typeof d.cell.raw === 'string') {
+        if (d.cell.raw.startsWith('+')) d.cell.styles.textColor = [74, 103, 65];
+        else if (d.cell.raw.startsWith('-')) d.cell.styles.textColor = WINE;
+      }
+    },
+    margin: {left: 15, right: 15},
+  });
+  y = doc.lastAutoTable.finalY + 4;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...WINE);
+  doc.text('ANÁLISE POR SETOR', 15, y);
+  doc.setDrawColor(...WINE);
+  doc.line(15, y+1, 51, y+1);
+  y += 3.5;
+
+  const colX = [15, 108];
+  const colW = 87;
+  const colSetores = [SETORES_RELATORIO.slice(0, 4), SETORES_RELATORIO.slice(4, 8)];
+  const yIniColunas = y;
+  let yFinais = [];
+
+  for (let ci = 0; ci < 2; ci++) {
+    let yL = yIniColunas;
+    const x = colX[ci];
+    for (const s of colSetores[ci]) {
+      const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
+      const setorOriginal = SETORES.find(x => x.key === s.key);
+      const desc = setorOriginal?.desc || '';
+      const saldoCor = c.s > 0 ? [74,103,65] : c.s < 0 ? WINE : INK3;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...INK);
+      const nomeLines = doc.splitTextToSize(s.nome, colW);
+      doc.text(nomeLines, x, yL);
+      yL += nomeLines.length * 2.9 + 0.5;
+
+      doc.setFont('courier', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...INK3);
+      const p1 = `Adm:${fmtN(c.a)}  Des:${fmtN(c.d)}  `;
+      doc.text(p1, x, yL);
+      const w1 = doc.getTextWidth(p1);
+      doc.setTextColor(...saldoCor);
+      const p2 = `Saldo:${fmt(c.s)}`;
+      doc.text(p2, x + w1, yL);
+      const w2 = doc.getTextWidth(p2);
+      doc.setTextColor(...INK3);
+      doc.text(`  Est:${fmtN(c.e)}  Var:${fmtPct(variacaoPct(c.s, c.e))}`, x + w1 + w2, yL);
+      yL += 3.2;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.8);
+      doc.setTextColor(...INK2);
+      const descLines = doc.splitTextToSize(desc, colW);
+      doc.text(descLines, x, yL);
+      yL += descLines.length * 2.8 + 3;
+    }
+    yFinais.push(yL);
+  }
+
+  y = Math.max(...yFinais);
+  rodape();
+  const mesId = r.mes.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  doc.save(`relatorio_sindmetal_pb_${mesId}_${r.ano}.pdf`);
+}
+
+document.getElementById('ftYear').textContent = new Date().getFullYear();
+
+async function carregar(){
+  try{
+    const cacheBuster = Date.now();
+    const r = await fetch(`data/dados.json?t=${cacheBuster}`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    RAW = d.registros;
+    SETORES = d.setores;
+    MESES = d.meses_por_ano;
+    const last = RAW[RAW.length-1];
+    document.getElementById('ftUpdated').textContent = `Última atualização: ${last.mes}/${last.ano}`;
+    render();
+  } catch(e){
+    console.error('Erro carregando dados.json:', e);
+    document.querySelector('main.container').insertAdjacentHTML('afterbegin',
+      `<div style="padding:24px;background:#f4e0dc;border:1px solid #7A1A1A;border-radius:4px;color:#7A1A1A;font-family:Inter,sans-serif;margin-bottom:24px">
+       <strong>Falha ao carregar dados.</strong><br>Verifique a conexão ou recarregue em alguns instantes.
+       <br><small style="font-family:'Courier Prime',monospace">${e.message}</small></div>`);
+  }
+}
+carregar();
+</script>
+</body>
+</html>
