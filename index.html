@@ -725,6 +725,7 @@
       <h2 class="section-h" style="border:0;padding-bottom:0;margin-bottom:0">Tabela de Dados</h2>
       <div>
         <button id="btnPDF" class="btn-export" onclick="exportPDF()">Baixar Relatório PDF</button>
+        <button id="btnWord" class="btn-export" onclick="exportWord()">Baixar Word</button>
         <button id="btnExcel" class="btn-export" onclick="exportExcel()">Baixar Excel</button>
         <button id="btnCSV" class="btn-export" onclick="exportCSV()">Baixar CSV</button>
       </div>
@@ -1098,6 +1099,71 @@ function exportCSV(){
   const a = document.createElement('a');
   a.href = url;
   a.download = `relatorio_sindmetal_pb_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportWord(){
+  const data = getFiltered();
+  if (!data.length) return;
+  const r = data[data.length - 1];
+
+  const linhas = [
+    ['Total dos municípios',                r.adm_m, r.des_m, r.sal_m, r.est_m, variacaoPct(r.sal_m, r.est_m)],
+    ['Total da Indústria de Transformação', r.adm_t, r.des_t, r.sal_t, r.est_t, variacaoPct(r.sal_t, r.est_t)],
+    ['Total Base Sindicato Metalúrgicos',   r.adm_b, r.des_b, r.sal_b, r.est_b, variacaoPct(r.sal_b, r.est_b)],
+  ];
+  for (const s of SETORES_RELATORIO) {
+    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
+    linhas.push([s.nome, c.a, c.d, c.s, c.e, variacaoPct(c.s, c.e)]);
+  }
+
+  const nf = n => (typeof n === 'number' ? n.toLocaleString('pt-BR') : n);
+  const corpo = linhas.map((l, i) => {
+    const forte = i < 3 ? ' style="font-weight:bold"' : '';
+    return `<tr${forte}>
+      <td class="desc">${l[0]}</td>
+      <td class="num">${nf(l[1])}</td>
+      <td class="num">${nf(l[2])}</td>
+      <td class="num">${nf(l[3])}</td>
+      <td class="num">${nf(l[4])}</td>
+      <td class="num">${fmtPct(l[5])}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>Relatório ${r.mes} ${r.ano}</title>
+<style>
+  body{font-family:Calibri,Arial,sans-serif;color:#1a1917;}
+  h1{font-size:15pt;margin:0;}
+  .sub{color:#7A1A1A;font-size:11pt;margin:3pt 0 12pt;}
+  table{border-collapse:collapse;width:100%;}
+  th,td{border:1px solid #999999;padding:4pt 6pt;font-size:9pt;}
+  th{background:#1a1917;color:#ffffff;text-align:center;}
+  td.desc{text-align:left;}
+  td.num{text-align:right;}
+  .foot{margin-top:16pt;color:#6b6860;font-size:7.5pt;}
+</style></head>
+<body>
+  <h1>Sindicato dos Metalúrgicos de Pato Branco</h1>
+  <div class="sub">Relatório Mensal &middot; ${r.mes} de ${r.ano}</div>
+  <table>
+    <tr>
+      <th style="text-align:left">Descrição</th>
+      <th>Admissões</th><th>Desligamentos</th><th>Saldo</th><th>Estoque</th><th>Variação %</th>
+    </tr>
+    ${corpo}
+  </table>
+  <div class="foot">28 Municípios da Base Sindical &middot; 8 Grupamentos CNAE<br>
+  Cid Cordeiro Silva (Economista) &middot; Carolina Cordeiro Silva (Soluções em IA) &middot; Macroanalysis</div>
+</body></html>`;
+
+  const blob = new Blob(['﻿', html], {type: 'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const mesId = r.mes.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  a.href = url;
+  a.download = `relatorio_sindmetal_pb_${mesId}_${r.ano}.doc`;
   a.click();
   URL.revokeObjectURL(url);
 }
