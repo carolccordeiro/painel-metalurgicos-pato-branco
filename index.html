@@ -1106,64 +1106,120 @@ function exportCSV(){
 function exportWord(){
   const data = getFiltered();
   if (!data.length) return;
-  const r = data[data.length - 1];
 
-  const linhas = [
-    ['Total dos municípios',                r.adm_m, r.des_m, r.sal_m, r.est_m, variacaoPct(r.sal_m, r.est_m)],
-    ['Total da Indústria de Transformação', r.adm_t, r.des_t, r.sal_t, r.est_t, variacaoPct(r.sal_t, r.est_t)],
-    ['Total Base Sindicato Metalúrgicos',   r.adm_b, r.des_b, r.sal_b, r.est_b, variacaoPct(r.sal_b, r.est_b)],
-  ];
-  for (const s of SETORES_RELATORIO) {
-    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
-    linhas.push([s.nome, c.a, c.d, c.s, c.e, variacaoPct(c.s, c.e)]);
-  }
+  // Série selecionada (mesma lógica do render)
+  const ser = document.getElementById('selSerie').value;
+  const pk  = ser==='base'?'b': ser==='transf'?'t':'m';
+  const serLabel = ser==='base'?'Base Sindicato':ser==='transf'?'Ind. Transformação':'Total Municípios';
+  const anoSel = document.getElementById('selAno').value;
+  const mesSel = document.getElementById('selMes').value;
 
-  const nf = n => (typeof n === 'number' ? n.toLocaleString('pt-BR') : n);
-  const corpo = linhas.map((l, i) => {
-    const forte = i < 3 ? ' style="font-weight:bold"' : '';
-    return `<tr${forte}>
-      <td class="desc">${l[0]}</td>
-      <td class="num">${nf(l[1])}</td>
-      <td class="num">${nf(l[2])}</td>
-      <td class="num">${nf(l[3])}</td>
-      <td class="num">${nf(l[4])}</td>
-      <td class="num">${fmtPct(l[5])}</td>
-    </tr>`;
+  const first = data[0].m, last = data[data.length-1].m;
+  const periodoTxt = first===last ? first : `${first} – ${last}`;
+  const pLabel = (anoSel!=='todos' && mesSel!=='todos') ? `em ${mesSel.toLowerCase()} de ${anoSel}`
+               : (anoSel!=='todos') ? `no ano de ${anoSel}`
+               : `no período de ${first} a ${last}`;
+
+  const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // KPIs da série
+  const adm=data.map(r=>r['adm_'+pk]), des=data.map(r=>r['des_'+pk]), sal=data.map(r=>r['sal_'+pk]), est=data.map(r=>r['est_'+pk]);
+  const totAdm=adm.reduce((a,b)=>a+b,0), totDes=des.reduce((a,b)=>a+b,0), totSal=sal.reduce((a,b)=>a+b,0), lastEst=est[est.length-1]||0;
+  let bestIdx=0, worstIdx=0;
+  sal.forEach((v,i)=>{ if(v>sal[bestIdx]) bestIdx=i; if(v<sal[worstIdx]) worstIdx=i; });
+
+  // Setores agregados no período, ordenados por saldo (como no dashboard)
+  const setores = SETORES.map(s=>{
+    const ta=data.reduce((a,r)=>a+(r.cats[s.key]?.a||0),0);
+    const td=data.reduce((a,r)=>a+(r.cats[s.key]?.d||0),0);
+    const ts=data.reduce((a,r)=>a+(r.cats[s.key]?.s||0),0);
+    const le=data[data.length-1]?.cats[s.key]?.e||0;
+    return {...s, ta, td, ts, le};
+  }).sort((a,b)=>b.ts-a.ts);
+  const topSetor=setores[0], botSetor=setores[setores.length-1];
+
+  // Tabela mensal geral (série selecionada)
+  const tabelaGeral = data.map(r=>
+    `<tr><td class="desc">${r.mes}/${r.ano}</td><td class="num">${fmtN(r['adm_'+pk])}</td><td class="num">${fmtN(r['des_'+pk])}</td><td class="num">${fmt(r['sal_'+pk])}</td><td class="num">${fmtN(r['est_'+pk])}</td></tr>`
+  ).join('');
+
+  // Blocos por setor: números + texto analítico + descrição + tabela mensal
+  const blocosSetor = setores.map(s=>{
+    const tendVerb = s.ts>0?'saldo positivo':s.ts<0?'saldo negativo':'saldo neutro';
+    const tendAdj  = s.ts>0?'crescimento':s.ts<0?'retração':'estabilidade';
+    const txt1 = `O setor registrou <strong>${tendVerb} de ${fmt(s.ts)} posto${Math.abs(s.ts)!==1?'s':''}</strong> de trabalho ${pLabel}, com ${fmtN(s.ta)} admissões e ${fmtN(s.td)} desligamentos. O estoque encerrou em <strong>${fmtN(s.le)} trabalhadores</strong>, indicando <strong>${tendAdj}</strong> no nível de emprego.`;
+    const linhasSetor = data.map(r=>{
+      const c=r.cats[s.key]||{a:0,d:0,s:0,e:0};
+      return `<tr><td class="desc">${r.mes}/${r.ano}</td><td class="num">${fmtN(c.a)}</td><td class="num">${fmtN(c.d)}</td><td class="num">${fmt(c.s)}</td><td class="num">${fmtN(c.e)}</td></tr>`;
+    }).join('');
+    return `
+    <h2 style="color:${s.cor}">${esc(s.nome)}</h2>
+    <p class="pills"><strong>Admissões:</strong> ${fmtN(s.ta)} &nbsp;·&nbsp; <strong>Desligamentos:</strong> ${fmtN(s.td)} &nbsp;·&nbsp; <strong>Saldo:</strong> ${fmt(s.ts)} &nbsp;·&nbsp; <strong>Estoque final:</strong> ${fmtN(s.le)}</p>
+    <p>${txt1}</p>
+    <p class="desc-setor">${esc(s.desc)}</p>
+    <table>
+      <tr><th style="text-align:left">Período</th><th>Admitidos</th><th>Desligados</th><th>Saldo</th><th>Estoque</th></tr>
+      ${linhasSetor}
+    </table>`;
   }).join('');
 
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="utf-8"><title>Relatório ${r.mes} ${r.ano}</title>
+<head><meta charset="utf-8"><title>Relatório de Análise · ${periodoTxt}</title>
 <style>
-  body{font-family:Calibri,Arial,sans-serif;color:#1a1917;}
-  h1{font-size:15pt;margin:0;}
-  .sub{color:#7A1A1A;font-size:11pt;margin:3pt 0 12pt;}
-  table{border-collapse:collapse;width:100%;}
-  th,td{border:1px solid #999999;padding:4pt 6pt;font-size:9pt;}
+  body{font-family:Calibri,Arial,sans-serif;color:#1a1917;font-size:10pt;}
+  h1{font-size:16pt;margin:0;}
+  h2{font-size:12pt;margin:16pt 0 5pt;border-bottom:1px solid #cccccc;padding-bottom:2pt;}
+  .sub{color:#7A1A1A;font-size:11pt;margin:3pt 0 10pt;}
+  table{border-collapse:collapse;width:100%;margin:4pt 0 8pt;}
+  th,td{border:1px solid #999999;padding:3pt 6pt;font-size:9pt;}
   th{background:#1a1917;color:#ffffff;text-align:center;}
   td.desc{text-align:left;}
   td.num{text-align:right;}
-  .foot{margin-top:16pt;color:#6b6860;font-size:7.5pt;}
+  p{margin:4pt 0;line-height:1.35;}
+  .pills{color:#3f3d38;}
+  .desc-setor{color:#3f3d38;font-style:italic;}
+  .foot{margin-top:18pt;color:#6b6860;font-size:7.5pt;border-top:1px solid #cccccc;padding-top:6pt;}
 </style></head>
 <body>
   <h1>Sindicato dos Metalúrgicos de Pato Branco</h1>
-  <div class="sub">Relatório Mensal &middot; ${r.mes} de ${r.ano}</div>
+  <div class="sub">Relatório de Análise &middot; ${serLabel} &middot; ${periodoTxt}</div>
+
+  <h2>Resumo do Período</h2>
   <table>
-    <tr>
-      <th style="text-align:left">Descrição</th>
-      <th>Admissões</th><th>Desligamentos</th><th>Saldo</th><th>Estoque</th><th>Variação %</th>
-    </tr>
-    ${corpo}
+    <tr><th>Total Admitidos</th><th>Total Desligados</th><th>Saldo Acumulado</th><th>Estoque (último mês)</th><th>Meses</th></tr>
+    <tr><td class="num">${fmtN(totAdm)}</td><td class="num">${fmtN(totDes)}</td><td class="num">${fmt(totSal)}</td><td class="num">${fmtN(lastEst)}</td><td class="num">${data.length}</td></tr>
   </table>
-  <div class="foot">28 Municípios da Base Sindical &middot; 8 Grupamentos CNAE<br>
+
+  <h2>Destaques</h2>
+  <table>
+    <tr><th>Melhor mês</th><th>Pior mês</th><th>Setor destaque</th><th>Maior retração</th></tr>
+    <tr>
+      <td class="desc">${data[bestIdx].mes}/${data[bestIdx].ano.slice(2)} (${fmt(sal[bestIdx])})</td>
+      <td class="desc">${data[worstIdx].mes}/${data[worstIdx].ano.slice(2)} (${fmt(sal[worstIdx])})</td>
+      <td class="desc">${esc(topSetor.nome)} (${fmt(topSetor.ts)})</td>
+      <td class="desc">${esc(botSetor.nome)} (${fmt(botSetor.ts)})</td>
+    </tr>
+  </table>
+
+  <h2>Evolução Mensal &middot; ${serLabel}</h2>
+  <table>
+    <tr><th style="text-align:left">Período</th><th>Admitidos</th><th>Desligados</th><th>Saldo</th><th>Estoque</th></tr>
+    ${tabelaGeral}
+  </table>
+
+  <h1 style="font-size:13pt;margin-top:20pt">Análise por Setor</h1>
+  ${blocosSetor}
+
+  <div class="foot">28 Municípios da Base Sindical &middot; 8 Grupamentos CNAE &middot; Período: ${periodoTxt}<br>
   Cid Cordeiro Silva (Economista) &middot; Carolina Cordeiro Silva (Soluções em IA) &middot; Macroanalysis</div>
 </body></html>`;
 
   const blob = new Blob(['﻿', html], {type: 'application/msword'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const mesId = r.mes.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const slug = periodoTxt.replace(/[^0-9a-z]+/gi,'_').replace(/^_|_$/g,'');
   a.href = url;
-  a.download = `relatorio_sindmetal_pb_${mesId}_${r.ano}.doc`;
+  a.download = `relatorio_analise_sindmetal_pb_${slug}.doc`;
   a.click();
   URL.revokeObjectURL(url);
 }
