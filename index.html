@@ -181,31 +181,111 @@
   .report-title {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 36px 36px 30px;
+    padding: 48px 36px 40px;
+  }
+  .report-title .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--wine);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    margin-bottom: 18px;
   }
   .report-title h1 {
     font-family: var(--sans);
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 44px;
+    font-weight: 300;
     color: var(--ink);
-    letter-spacing: -0.8px;
-    line-height: 1.15;
+    letter-spacing: -1.4px;
+    line-height: 1.08;
     margin-bottom: 8px;
   }
   .report-title h1::after {
     content: '';
     display: block;
-    width: 80px;
-    height: 2px;
+    width: 72px;
+    height: 1px;
     background: var(--wine);
-    margin-top: 14px;
+    margin-top: 22px;
   }
   .report-title .subtitle {
     font-family: var(--mono);
     font-size: 12px;
     color: var(--ink3);
     letter-spacing: 0.3px;
-    margin-top: 14px;
+    margin-top: 18px;
+  }
+  @media (max-width: 640px){ .report-title h1 { font-size: 32px; } }
+
+  /* HERO (saldo em destaque) */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 1px solid #000;
+  }
+  .hero-inner { padding: 44px 0 40px; }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2.2px;
+    color: #a8a39a;
+    margin-bottom: 20px;
+  }
+  .hero-eyebrow b { color: #fff; font-weight: 400; }
+  .hero-top {
+    display: flex;
+    align-items: flex-end;
+    gap: 34px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+  .hero-num {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 108px;
+    line-height: 0.9;
+    letter-spacing: -4px;
+    color: var(--wine-mid);
+  }
+  .hero-num.pos { color: #8FB096; }
+  .hero-say {
+    font-family: var(--sans);
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: #e4e0d8;
+    max-width: 440px;
+    padding-bottom: 10px;
+  }
+  .hero-say b { color: #fff; font-weight: 600; }
+  .hero-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding-top: 26px;
+    border-top: 1px solid #2f2c28;
+  }
+  .hero-stat .hs-val {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 30px;
+    letter-spacing: -1px;
+    line-height: 1;
+    color: #fff;
+  }
+  .hero-stat .hs-val.neg { color: var(--wine-mid); }
+  .hero-stat .hs-lbl {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #a8a39a;
+    margin-top: 10px;
+    line-height: 1.4;
+  }
+  @media (max-width: 760px){
+    .hero-num { font-size: 74px; }
+    .hero-strip { grid-template-columns: repeat(2, 1fr); gap: 22px; }
   }
 
   /* CONTAINER */
@@ -311,12 +391,12 @@
     margin-bottom: 8px;
   }
   .hl-value {
-    font-family: var(--mono);
-    font-size: 26px;
-    font-weight: 700;
+    font-family: var(--sans);
+    font-size: 34px;
+    font-weight: 300;
     color: var(--ink);
-    line-height: 1.1;
-    letter-spacing: -0.5px;
+    line-height: 1.05;
+    letter-spacing: -1px;
   }
   .hl-meta {
     font-family: var(--sans);
@@ -357,10 +437,10 @@
     margin-bottom: 8px;
   }
   .kpi .val {
-    font-family: var(--mono);
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -1px;
+    font-family: var(--sans);
+    font-size: 42px;
+    font-weight: 300;
+    letter-spacing: -1.8px;
     color: var(--ink);
     line-height: 1;
   }
@@ -679,9 +759,14 @@
 
 <section class="report-title">
   <div class="container">
+    <p class="eyebrow">Painel de Análise do Emprego Formal</p>
     <h1>Sindicato dos Metalúrgicos de Pato Branco</h1>
     <p class="subtitle">Indicadores do Mercado de Trabalho · 28 Municípios da Base Sindical</p>
   </div>
+</section>
+
+<section class="hero">
+  <div class="container hero-inner" id="heroBox"></div>
 </section>
 
 <main class="container">
@@ -924,6 +1009,22 @@ function render(){
       <div class="hl-label">Maior retração</div>
       <div class="hl-value">${fmt(botSetor.ts)}</div>
       <div class="hl-meta">${botSetor.nome.replace(/^Fabricação de /i,'').slice(0,42)}${botSetor.nome.length>42?'…':''}</div>
+    </div>
+  `;
+
+  // HERO (saldo em destaque)
+  const firstEst = est[0]||lastEst;
+  document.getElementById('heroBox').innerHTML = `
+    <div class="hero-eyebrow"><b>${serLabel}</b> · ${periodoTxt}</div>
+    <div class="hero-top">
+      <div class="hero-num ${totSal>=0?'pos':''}">${fmt(totSal)}</div>
+      <div class="hero-say">postos de trabalho no saldo do período, resultado de <b>${fmtN(totAdm)}</b> admissões e <b>${fmtN(totDes)}</b> desligamentos.</div>
+    </div>
+    <div class="hero-strip">
+      <div class="hero-stat"><div class="hs-val">${fmtN(firstEst)} → ${fmtN(lastEst)}</div><div class="hs-lbl">Estoque no período</div></div>
+      <div class="hero-stat"><div class="hs-val">${saldoPos} de ${data.length}</div><div class="hs-lbl">Meses com saldo positivo</div></div>
+      <div class="hero-stat"><div class="hs-val">${fmt(sal[bestIdx])}</div><div class="hs-lbl">Melhor mês · ${data[bestIdx].mes.toLowerCase()}/${data[bestIdx].ano.slice(2)}</div></div>
+      <div class="hero-stat"><div class="hs-val ${sal[worstIdx]<0?'neg':''}">${fmt(sal[worstIdx])}</div><div class="hs-lbl">Pior mês · ${data[worstIdx].mes.toLowerCase()}/${data[worstIdx].ano.slice(2)}</div></div>
     </div>
   `;
 
