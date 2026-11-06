@@ -40,10 +40,10 @@
     --pos-tint: #E4EBE4;
     --neg: #A63424;
     --neg-tint: #F2E4E0;
-    --radius: 4px;
-    --radius-lg: 6px;
-    --shadow-sm: 0 1px 2px rgba(26,26,26,0.04);
-    --shadow-md: 0 2px 10px rgba(26,26,26,0.06);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 3px rgba(26,26,26,0.05);
+    --shadow-md: 0 6px 24px rgba(26,26,26,0.08);
     --sans: 'Aileron', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
     --mono: 'Courier Prime', 'Courier New', ui-monospace, monospace;
   }
@@ -110,10 +110,72 @@
     border: 1px solid rgba(255,255,255,0.25);
     color: #fff;
     padding: 7px 14px;
-    border-radius: 2px;
+    border-radius: 999px;
     white-space: nowrap;
     letter-spacing: 0.5px;
   }
+  .masthead-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .btn-guia {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    background: var(--wine); color: #fff; border: 0;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    letter-spacing: 0.2px; transition: transform .15s var(--ease,ease), background .2s, box-shadow .2s;
+    box-shadow: 0 2px 10px rgba(166,52,36,0.35);
+  }
+  .btn-guia:hover { background: var(--wine-mid); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(166,52,36,0.42); }
+  .btn-guia-ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 999px;
+    background: rgba(255,255,255,0.22); font-weight: 700; font-size: 12px;
+  }
+
+  /* GUIA (modal) */
+  .guia-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(26,26,26,0.55); backdrop-filter: blur(3px);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 40px 16px; overflow-y: auto;
+  }
+  .guia-overlay.open { display: flex; animation: guiaFade .2s ease; }
+  @keyframes guiaFade { from { opacity: 0 } to { opacity: 1 } }
+  .guia-card {
+    background: var(--surface); color: var(--ink);
+    width: 100%; max-width: 680px; border-radius: var(--radius-lg);
+    box-shadow: 0 24px 70px rgba(26,26,26,0.35);
+    overflow: hidden; animation: guiaUp .25s var(--ease,ease);
+  }
+  @keyframes guiaUp { from { transform: translateY(14px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  .guia-head {
+    background: var(--ink); color: #fff;
+    padding: 22px 28px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 3px solid var(--wine);
+  }
+  .guia-head h2 { font-family: var(--sans); font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .guia-head p { font-family: var(--mono); font-size: 11px; color: #b8b4ac; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .guia-close {
+    background: rgba(255,255,255,0.14); color: #fff; border: 0;
+    width: 34px; height: 34px; border-radius: 999px; cursor: pointer;
+    font-size: 20px; line-height: 1; flex-shrink: 0; transition: background .2s;
+  }
+  .guia-close:hover { background: rgba(255,255,255,0.28); }
+  .guia-body { padding: 26px 28px 30px; }
+  .guia-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .guia-step:last-child { border-bottom: 0; }
+  .guia-num {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 999px;
+    background: var(--wine-tint); color: var(--wine);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .guia-step h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
+  .guia-step p { font-size: 13.5px; color: var(--ink2); line-height: 1.55; }
+  .guia-step b { color: var(--ink); }
+  .guia-defs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 18px; margin-top: 8px; }
+  .guia-defs div { font-size: 13px; color: var(--ink2); }
+  .guia-defs b { color: var(--wine); }
+  .guia-foot { margin-top: 18px; padding: 14px 16px; background: var(--surface2); border-radius: var(--radius); font-size: 13px; color: var(--ink2); }
+  @media (max-width: 560px) { .guia-defs { grid-template-columns: 1fr; } }
 
   /* REPORT TITLE */
   .report-title {
@@ -607,7 +669,12 @@
       <div class="brand-tag">Centro de Assessoria Econômica</div>
     </div>
   </div>
-  <span class="badge" id="badgePeriodo">Jan/2024 – Mar/2026</span>
+  <div class="masthead-right">
+    <button class="btn-guia" onclick="abrirGuia()" aria-label="Abrir guia de uso">
+      <span class="btn-guia-ico">?</span> Como usar
+    </button>
+    <span class="badge" id="badgePeriodo">Jan/2024 – Mar/2026</span>
+  </div>
 </header>
 
 <section class="report-title">
@@ -1525,6 +1592,73 @@ async function carregar(){
   }
 }
 carregar();
+</script>
+
+<!-- GUIA DE USO -->
+<div class="guia-overlay" id="guiaOverlay" onclick="if(event.target===this)fecharGuia()">
+  <div class="guia-card" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo">
+    <div class="guia-head">
+      <div>
+        <h2 id="guiaTitulo">Como usar este painel</h2>
+        <p>Guia rápido</p>
+      </div>
+      <button class="guia-close" onclick="fecharGuia()" aria-label="Fechar guia">&times;</button>
+    </div>
+    <div class="guia-body">
+      <div class="guia-step">
+        <div class="guia-num">1</div>
+        <div>
+          <h3>O que este painel mostra</h3>
+          <p>Mês a mês, como está o emprego formal na metalurgia e na indústria dos <b>28 municípios</b> da base do sindicato: quantas pessoas foram contratadas, quantas saíram e como ficou o total de empregos.</p>
+        </div>
+      </div>
+      <div class="guia-step">
+        <div class="guia-num">2</div>
+        <div>
+          <h3>Escolha o que quer ver</h3>
+          <p>Use os seletores no topo da página:</p>
+          <div class="guia-defs">
+            <div><b>Série</b> &nbsp;Base Sindicato (os 8 setores da metalurgia), Indústria de Transformação ou Total dos Municípios.</div>
+            <div><b>Ano / Mês</b> &nbsp;um mês específico, um ano inteiro, ou tudo desde 2024.</div>
+          </div>
+        </div>
+      </div>
+      <div class="guia-step">
+        <div class="guia-num">3</div>
+        <div>
+          <h3>O que cada número significa</h3>
+          <div class="guia-defs">
+            <div><b>Admitidos</b> &nbsp;pessoas contratadas no período.</div>
+            <div><b>Desligados</b> &nbsp;pessoas que saíram.</div>
+            <div><b>Saldo</b> &nbsp;admitidos menos desligados. Positivo gerou emprego; negativo perdeu.</div>
+            <div><b>Estoque</b> &nbsp;total de empregos no fim do período.</div>
+          </div>
+        </div>
+      </div>
+      <div class="guia-step">
+        <div class="guia-num">4</div>
+        <div>
+          <h3>Os gráficos</h3>
+          <p>Mostram a evolução mês a mês, a comparação entre os anos, um mapa de calor dos saldos e o ranking dos setores. Passe o mouse (ou o dedo) em cima de cada ponto para ver o valor exato.</p>
+        </div>
+      </div>
+      <div class="guia-step">
+        <div class="guia-num">5</div>
+        <div>
+          <h3>Baixar o relatório</h3>
+          <p>Nos botões de baixar você leva os dados prontos: <b>PDF</b> e <b>Word</b> (relatório para ler e imprimir) e <b>Excel</b> e <b>CSV</b> (planilhas para trabalhar os números).</p>
+        </div>
+      </div>
+      <div class="guia-foot">
+        Dica: o painel se atualiza sozinho todo mês, assim que o novo dado oficial é publicado. É só voltar aqui para ver o número mais recente.
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function abrirGuia(){ document.getElementById('guiaOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+  function fecharGuia(){ document.getElementById('guiaOverlay').classList.remove('open'); document.body.style.overflow=''; }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') fecharGuia(); });
 </script>
 </body>
 </html>
