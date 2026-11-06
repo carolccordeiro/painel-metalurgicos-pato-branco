@@ -1326,10 +1326,11 @@ function exportWord(){
       return `<tr><td class="desc">${r.mes}/${r.ano}</td><td class="num">${fmtN(c.a)}</td><td class="num">${fmtN(c.d)}</td><td class="num">${fmt(c.s)}</td><td class="num">${fmtN(c.e)}</td></tr>`;
     }).join('');
     return `
-    <h2 style="color:${s.cor}">${esc(s.nome)}</h2>
-    <p class="pills"><strong>Admissões:</strong> ${fmtN(s.ta)} &nbsp;·&nbsp; <strong>Desligamentos:</strong> ${fmtN(s.td)} &nbsp;·&nbsp; <strong>Saldo:</strong> ${fmt(s.ts)} &nbsp;·&nbsp; <strong>Estoque final:</strong> ${fmtN(s.le)}</p>
-    <p>${txt1}</p>
+    <br>
+    <h2>${esc(s.nome)}</h2>
+    <div class="setor-num">${fmt(s.ts)} <span style="font-size:9pt;color:#6b6860">postos no período &middot; ${fmtN(s.ta)} adm &middot; ${fmtN(s.td)} des &middot; estoque ${fmtN(s.le)}</span></div>
     <p class="desc-setor">${esc(s.desc)}</p>
+    <div class="diag"><b>Diagnóstico:</b> ${txt1}</div>
     <table>
       <tr><th style="text-align:left">Período</th><th>Admitidos</th><th>Desligados</th><th>Saldo</th><th>Estoque</th></tr>
       ${linhasSetor}
@@ -1339,31 +1340,56 @@ function exportWord(){
   const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>Relatório de Análise · ${periodoTxt}</title>
 <style>
-  body{font-family:Calibri,Arial,sans-serif;color:#1a1917;font-size:10pt;}
-  h1{font-size:16pt;margin:0;}
-  h2{font-size:12pt;margin:16pt 0 5pt;border-bottom:1px solid #cccccc;padding-bottom:2pt;}
+  body{font-family:'Segoe UI',Calibri,Arial,sans-serif;color:#1A1A1A;font-size:10pt;}
+  /* Capa escura */
+  .cover td{padding:46pt 40pt 40pt;}
+  .cv-eyebrow{font-family:'Courier New',monospace;color:#A89F96;font-size:9pt;letter-spacing:2px;}
+  .cv-title{color:#ffffff;font-size:34pt;font-weight:normal;margin-top:60pt;letter-spacing:-1pt;}
+  .cv-year{color:#C24632;font-size:24pt;margin-top:2pt;}
+  .cv-sub{color:#A89F96;font-size:12pt;margin-top:10pt;}
+  .cv-rule{border-top:1px solid #3a3733;margin-top:48pt;padding-top:10pt;}
+  .cv-auth-t{color:#ffffff;font-size:11pt;font-weight:bold;}
+  .cv-auth{color:#A89F96;font-size:8.5pt;margin-top:3pt;}
+  /* Seções */
+  .eyebrow{font-family:'Courier New',monospace;color:#A63424;font-size:8.5pt;letter-spacing:1.5px;margin:18pt 0 2pt;}
+  h1{font-size:15pt;font-weight:normal;margin:4pt 0 2pt;}
+  h2{font-size:13pt;font-weight:bold;margin:2pt 0 6pt;}
   .sub{color:#A63424;font-size:11pt;margin:3pt 0 10pt;}
+  .setor-num{color:#A63424;font-size:20pt;}
+  .setor-num.neg{color:#A63424;}
   table{border-collapse:collapse;width:100%;margin:4pt 0 8pt;}
-  th,td{border:1px solid #999999;padding:3pt 6pt;font-size:9pt;}
-  th{background:#1a1917;color:#ffffff;text-align:center;}
-  td.desc{text-align:left;}
+  th,td{border:1px solid #D8D2C4;padding:3pt 6pt;font-size:9pt;}
+  th{background:#1A1A1A;color:#ffffff;text-align:right;}
+  td.desc,th:first-child{text-align:left;}
   td.num{text-align:right;}
-  p{margin:4pt 0;line-height:1.35;}
+  p{margin:4pt 0;line-height:1.4;}
   .pills{color:#3f3d38;}
+  .diag{background:#F4E6E3;border-left:3px solid #A63424;padding:6pt 10pt;color:#3f3d38;margin:6pt 0 10pt;}
+  .diag b{color:#1A1A1A;}
   .desc-setor{color:#3f3d38;font-style:italic;}
-  .foot{margin-top:18pt;color:#6b6860;font-size:7.5pt;border-top:1px solid #cccccc;padding-top:6pt;}
+  .foot{margin-top:18pt;color:#6b6860;font-size:7.5pt;border-top:1px solid #D8D2C4;padding-top:6pt;}
 </style></head>
 <body>
-  <h1>Sindicato dos Metalúrgicos de Pato Branco</h1>
-  <div class="sub">Relatório de Análise &middot; ${serLabel} &middot; ${periodoTxt}</div>
+  <table class="cover" width="100%"><tr><td bgcolor="#1A1A1A">
+    <div class="cv-eyebrow">SINDICATO DOS METALÚRGICOS DE PATO BRANCO</div>
+    <div class="cv-title">Relatório de Análise</div>
+    <div class="cv-year">${anoSel!=='todos'?anoSel:'Série histórica'}</div>
+    <div class="cv-sub">${serLabel} &middot; ${periodoTxt}</div>
+    <div class="cv-rule"></div>
+    <div class="cv-auth-t">Centro de Assessoria Econômica</div>
+    <div class="cv-auth">Cid Cordeiro Silva (Economista) &middot; Carolina Cordeiro Silva (Soluções em IA) &middot; Macroanalysis</div>
+  </td></tr></table>
 
-  <h2>Resumo do Período</h2>
+  <div class="eyebrow">RESUMO &middot; ${periodoTxt}</div>
+  <h2>Resumo do período</h2>
   <table>
     <tr><th>Total Admitidos</th><th>Total Desligados</th><th>Saldo Acumulado</th><th>Estoque (último mês)</th><th>Meses</th></tr>
     <tr><td class="num">${fmtN(totAdm)}</td><td class="num">${fmtN(totDes)}</td><td class="num">${fmt(totSal)}</td><td class="num">${fmtN(lastEst)}</td><td class="num">${data.length}</td></tr>
   </table>
+  <div class="diag"><b>Diagnóstico:</b> a série ${serLabel} fechou o período com saldo de ${fmt(totSal)} posto${Math.abs(totSal)!==1?'s':''}, resultado de ${fmtN(totAdm)} admissões e ${fmtN(totDes)} desligamentos. O estoque encerrou em ${fmtN(lastEst)} trabalhadores.</div>
 
-  <h2>Destaques</h2>
+  <div class="eyebrow">DESTAQUES</div>
+  <h2>Onde o emprego cresceu e onde recuou</h2>
   <table>
     <tr><th>Melhor mês</th><th>Pior mês</th><th>Setor destaque</th><th>Maior retração</th></tr>
     <tr>
@@ -1374,13 +1400,16 @@ function exportWord(){
     </tr>
   </table>
 
-  <h2>Evolução Mensal &middot; ${serLabel}</h2>
+  <div class="eyebrow">EVOLUÇÃO MENSAL</div>
+  <h2>${serLabel}</h2>
   <table>
     <tr><th style="text-align:left">Período</th><th>Admitidos</th><th>Desligados</th><th>Saldo</th><th>Estoque</th></tr>
     ${tabelaGeral}
   </table>
 
-  <h1 style="font-size:13pt;margin-top:20pt">Análise por Setor</h1>
+  <br>
+  <div class="eyebrow">ANÁLISE POR SETOR</div>
+  <h1>Os oito grupamentos, do maior ao menor saldo</h1>
   ${blocosSetor}
 
   <div class="foot">28 Municípios da Base Sindical &middot; 8 Grupamentos CNAE &middot; Período: ${periodoTxt}<br>
@@ -1441,233 +1470,287 @@ const MUNICIPIOS_BASE = [
 function exportPDF(){
   const data = getFiltered();
   if (!data.length) return;
-  const r = data[data.length - 1];
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit: 'mm', format: 'a4'});
+  const W = 210, H = 297, M = 15, RIGHT = W - M, CW = W - 2*M;
 
-  const WINE = [166, 52, 36];
-  const INK = [26, 25, 23];
-  const INK2 = [63, 61, 56];
-  const INK3 = [107, 104, 96];
-  const MUTED = [156, 154, 148];
-  const WHITE = [255, 255, 255];
+  // Paleta Norea
+  const WINE=[166,52,36], WINE_MID=[194,70,50], INK=[26,25,23], PAPER=[247,246,243],
+        INK2=[63,61,56], INK3=[107,104,96], MUTED=[156,154,148], WHITE=[255,255,255],
+        POS=[92,122,98], LINE=[216,210,196], DARKLINE=[47,44,40], DARKMUT=[168,163,154],
+        TINT=[244,230,227];
 
-  function cabecalho(){
-    doc.setFillColor(...INK);
-    doc.rect(0, 0, 210, 22, 'F');
-    doc.setFillColor(...WINE);
-    doc.rect(15, 5.5, 11, 11, 'F');
-    doc.setDrawColor(...WHITE);
-    doc.setLineWidth(0.25);
-    doc.rect(16.3, 6.8, 8.4, 8.4);
-    doc.setFont('courier', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...WHITE);
-    doc.text('M', 20.5, 13.2, {align: 'center'});
-    doc.setFont('courier', 'bold');
-    doc.setFontSize(11);
-    doc.text('MACROANALYSIS', 30, 10.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(184, 180, 172);
-    doc.text('CENTRO DE ASSESSORIA ECONÔMICA', 30, 14.5);
-    doc.setFillColor(...WINE);
-    doc.rect(0, 22, 210, 0.8, 'F');
-  }
+  // Contexto série / período
+  const ser = document.getElementById('selSerie').value;
+  const pk  = ser==='base'?'b': ser==='transf'?'t':'m';
+  const serLabel = ser==='base'?'Base Sindicato Metalúrgicos': ser==='transf'?'Indústria de Transformação':'Total dos Municípios';
+  const anoSel = document.getElementById('selAno').value;
+  const first = data[0].m, last = data[data.length-1].m;
+  const periodoTxt = first===last ? first : `${first} a ${last}`;
+  const pLabel = (anoSel!=='todos') ? `em ${anoSel}` : `no período`;
 
-  function rodape(){
-    const pages = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pages; i++) {
-      doc.setPage(i);
-      doc.setDrawColor(216, 210, 196);
-      doc.setLineWidth(0.2);
-      doc.line(15, 285, 195, 285);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6.5);
-      doc.setTextColor(...MUTED);
-      doc.text('Cid Cordeiro Silva (Economista) · Carolina Cordeiro Silva (Soluções em IA) · Macroanalysis', 15, 288.5);
-      doc.text(`Página ${i} de ${pages}`, 195, 288.5, {align: 'right'});
+  // Agregados série
+  const adm=data.map(r=>r['adm_'+pk]), des=data.map(r=>r['des_'+pk]), sal=data.map(r=>r['sal_'+pk]), est=data.map(r=>r['est_'+pk]);
+  const totAdm=adm.reduce((a,b)=>a+b,0), totDes=des.reduce((a,b)=>a+b,0), totSal=sal.reduce((a,b)=>a+b,0);
+  const firstEst=est[0]||0, lastEst=est[est.length-1]||0, saldoPos=sal.filter(v=>v>0).length;
+  let bestIdx=0, worstIdx=0; sal.forEach((v,i)=>{ if(v>sal[bestIdx])bestIdx=i; if(v<sal[worstIdx])worstIdx=i; });
+
+  // Setores agregados no período, ordenados por saldo
+  const setores = SETORES.map(s=>{
+    const ta=data.reduce((a,r)=>a+(r.cats[s.key]?.a||0),0);
+    const td=data.reduce((a,r)=>a+(r.cats[s.key]?.d||0),0);
+    const ts=data.reduce((a,r)=>a+(r.cats[s.key]?.s||0),0);
+    const le=data[data.length-1]?.cats[s.key]?.e||0;
+    const desc=SETORES.find(x=>x.key===s.key)?.desc||'';
+    return {...s, ta, td, ts, le, desc};
+  }).sort((a,b)=>b.ts-a.ts);
+  const topSetor=setores[0], botSetor=setores[setores.length-1];
+
+  // Comparativo com ano anterior (quando um ano específico está selecionado)
+  let comp=null;
+  if(anoSel!=='todos'){
+    const yPrev=(parseInt(anoSel)-1).toString();
+    const mesesSel=data.map(r=>r.mes);
+    let prev=RAW.filter(r=>r.ano===yPrev && mesesSel.includes(r.mes));
+    prev.sort((a,b)=>MES_ORDEM.indexOf(a.mes)-MES_ORDEM.indexOf(b.mes));
+    if(prev.length){
+      const pAdm=prev.reduce((a,r)=>a+r['adm_'+pk],0), pDes=prev.reduce((a,r)=>a+r['des_'+pk],0),
+            pSal=prev.reduce((a,r)=>a+r['sal_'+pk],0), pEst=prev[prev.length-1]['est_'+pk];
+      const vpct=(c,p)=> p===0?0:(c-p)/Math.abs(p);
+      comp={yPrev, yCur:anoSel, pAdm,pDes,pSal,pEst, cAdm:totAdm,cDes:totDes,cSal:totSal,cEst:lastEst,
+            dSal:totSal-pSal, dEst:lastEst-pEst, vAdm:vpct(totAdm,pAdm), vDes:vpct(totDes,pDes)};
     }
   }
 
-  cabecalho();
-
-  let y = 28;
-  doc.setTextColor(...INK);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('Sindicato dos Metalúrgicos de Pato Branco', 15, y);
-  y += 4.5;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.setTextColor(...WINE);
-  doc.text(`Relatório Mensal · ${r.mes} de ${r.ano}`, 15, y);
-  y += 4;
-  doc.setFontSize(7.5);
-  doc.setTextColor(...INK3);
-  doc.text('28 Municípios da Base Sindical · 8 Grupamentos CNAE', 15, y);
-  y += 5.5;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.setTextColor(...INK2);
-  const muniText = MUNICIPIOS_BASE.join(' · ');
-  const muniLines = doc.splitTextToSize(muniText, 173);
-  const boxH = 4 + muniLines.length * 3 + 2;
-  doc.setFillColor(244, 230, 227);
-  doc.rect(15, y, 180, boxH, 'F');
-  doc.setFillColor(...WINE);
-  doc.rect(15, y, 1.2, boxH, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
-  doc.setTextColor(...WINE);
-  doc.text('MUNICÍPIOS DA BASE SINDICAL (28)', 18, y + 3.5);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.setTextColor(...INK2);
-  doc.text(muniLines, 18, y + 7);
-  y += boxH + 4;
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...WINE);
-  doc.text('SUMÁRIO EXECUTIVO', 15, y);
-  doc.setDrawColor(...WINE);
-  doc.setLineWidth(0.35);
-  doc.line(15, y+1, 55, y+1);
-  y += 4.5;
-
-  const setoresOrd = SETORES.map(s => ({...s, ts: r.cats[s.key]?.s || 0}));
-  setoresOrd.sort((a,b) => b.ts - a.ts);
-  const top = setoresOrd[0];
-  const bot = setoresOrd[setoresOrd.length - 1];
-
-  const items = [
-    `Saldo geral dos 28 municípios: ${fmt(r.sal_m)} postos (estoque ${fmtN(r.est_m)}).`,
-    `Indústria de Transformação na base: ${fmt(r.sal_t)} postos (estoque ${fmtN(r.est_t)}, ${fmtPct(variacaoPct(r.sal_t, r.est_t))}).`,
-    `Base Sindicato Metalúrgicos: ${fmt(r.sal_b)} postos (estoque ${fmtN(r.est_b)}, ${fmtPct(variacaoPct(r.sal_b, r.est_b))}).`,
-    `Destaque positivo: ${top.nome} (${fmt(top.ts)} postos). Maior retração: ${bot.nome} (${fmt(bot.ts)} postos).`,
-  ];
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(...INK);
-  for (const t of items) {
-    const lines = doc.splitTextToSize(t, 175);
-    doc.setFillColor(...WINE);
-    doc.circle(17, y - 1, 0.6, 'F');
-    doc.text(lines, 20, y);
-    y += lines.length * 3.5 + 0.5;
+  // ---------- helpers de layout ----------
+  let y = 0;
+  function novaPagina(){ doc.addPage(); y = 30; }
+  function garantir(h){ if(y + h > 278){ novaPagina(); } }
+  function eyebrow(txt){
+    doc.setFont('courier','normal'); doc.setFontSize(8); doc.setTextColor(...WINE);
+    doc.text(txt.toUpperCase(), M, y); y += 6;
   }
-  y += 2;
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...WINE);
-  doc.text('TABELA CONSOLIDADA', 15, y);
-  doc.setDrawColor(...WINE);
-  doc.line(15, y+1, 58, y+1);
-  y += 2.5;
-
-  const tableBody = [
-    ['Total dos municípios', fmtN(r.adm_m), fmtN(r.des_m), fmt(r.sal_m), fmtN(r.est_m), fmtPct(variacaoPct(r.sal_m, r.est_m))],
-    ['Total da Indústria de Transformação', fmtN(r.adm_t), fmtN(r.des_t), fmt(r.sal_t), fmtN(r.est_t), fmtPct(variacaoPct(r.sal_t, r.est_t))],
-    ['Total Base Sindicato Metalúrgicos', fmtN(r.adm_b), fmtN(r.des_b), fmt(r.sal_b), fmtN(r.est_b), fmtPct(variacaoPct(r.sal_b, r.est_b))],
-  ];
-  for (const s of SETORES_RELATORIO) {
-    const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
-    tableBody.push([s.nome, fmtN(c.a), fmtN(c.d), fmt(c.s), fmtN(c.e), fmtPct(variacaoPct(c.s, c.e))]);
+  function tituloSecao(txt){
+    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...INK);
+    doc.text(txt, M, y); y += 9;
+  }
+  function diagnostico(txt){
+    const label='Diagnóstico: ';
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...INK);
+    const lw=doc.getTextWidth(label);
+    const linhas=doc.splitTextToSize(txt, CW-lw);
+    garantir(linhas.length*3.6+4);
+    doc.text(label, M, y);
+    doc.setFont('helvetica','normal'); doc.setTextColor(...INK2);
+    doc.text(linhas[0], M+lw, y);
+    for(let i=1;i<linhas.length;i++){ y+=3.6; doc.text(linhas[i], M, y); }
+    y += 6;
+  }
+  function paragrafo(txt, cor=INK2, size=8.5){
+    doc.setFont('helvetica','normal'); doc.setFontSize(size); doc.setTextColor(...cor);
+    const linhas=doc.splitTextToSize(txt, CW);
+    garantir(linhas.length*3.8+3);
+    doc.text(linhas, M, y); y += linhas.length*3.8 + 4;
+  }
+  // tabela padrão (cabeçalho escuro, negativos terracota)
+  function tabela(head, body, opts={}){
+    doc.autoTable({
+      startY: y,
+      head: [head], body,
+      theme: 'grid',
+      styles: {font:'helvetica', fontSize:7.2, cellPadding:1.6, lineColor:LINE, lineWidth:0.1, textColor:INK},
+      headStyles: {fillColor:INK, textColor:WHITE, fontStyle:'bold', halign:'right', fontSize:7},
+      alternateRowStyles: {fillColor:[250,249,246]},
+      columnStyles: Object.assign({0:{halign:'left', cellWidth: opts.c0||72, textColor:INK}}, opts.columnStyles||{}),
+      margin: {left:M, right:M, top:30},
+      didParseCell: (d)=>{
+        if(d.section==='head' && d.column.index===0) d.cell.styles.halign='left';
+        if(d.section==='body' && typeof d.cell.raw==='string'){
+          const t=d.cell.raw;
+          if(opts.colorCols && opts.colorCols.includes(d.column.index)){
+            if(t.startsWith('+') && t!=='+0' && t!=='+0,00%') d.cell.styles.textColor=POS;
+            else if(t.startsWith('-')) d.cell.styles.textColor=WINE;
+          }
+        }
+        if(opts.boldRows && d.section==='body' && opts.boldRows.includes(d.row.index)){
+          d.cell.styles.fontStyle='bold';
+          if(opts.tintRows && opts.tintRows.includes(d.row.index)) d.cell.styles.fillColor=TINT;
+        }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 6;
   }
 
-  doc.autoTable({
-    startY: y,
-    head: [['Descrição', 'Admissões', 'Desligamentos', 'Saldo', 'Estoque', 'Variação %']],
-    body: tableBody,
-    styles: {font: 'helvetica', fontSize: 6.8, cellPadding: 1.3, lineColor: [216, 210, 196], lineWidth: 0.1},
-    headStyles: {fillColor: INK, textColor: WHITE, fontStyle: 'bold', halign: 'center', fontSize: 6.8},
-    columnStyles: {
-      0: {cellWidth: 78},
-      1: {halign: 'right', cellWidth: 21},
-      2: {halign: 'right', cellWidth: 24},
-      3: {halign: 'right', fontStyle: 'bold', cellWidth: 18},
-      4: {halign: 'right', cellWidth: 21},
-      5: {halign: 'right', cellWidth: 19},
-    },
-    didParseCell: (d) => {
-      if (d.section === 'body' && d.row.index === 2) {
-        d.cell.styles.fontStyle = 'bold';
-        d.cell.styles.fillColor = [244, 230, 227];
-      }
-      if (d.section === 'body' && d.column.index === 3 && typeof d.cell.raw === 'string') {
-        if (d.cell.raw.startsWith('+')) d.cell.styles.textColor = [74, 103, 65];
-        else if (d.cell.raw.startsWith('-')) d.cell.styles.textColor = WINE;
-      }
-      if (d.section === 'body' && d.column.index === 5 && typeof d.cell.raw === 'string') {
-        if (d.cell.raw.startsWith('+')) d.cell.styles.textColor = [74, 103, 65];
-        else if (d.cell.raw.startsWith('-')) d.cell.styles.textColor = WINE;
-      }
-    },
-    margin: {left: 15, right: 15},
+  // ====================== CAPA (escura) ======================
+  doc.setFillColor(...INK); doc.rect(0,0,W,H,'F');
+  doc.setFont('courier','normal'); doc.setFontSize(9); doc.setTextColor(...DARKMUT);
+  doc.text('SINDICATO DOS METALÚRGICOS DE PATO BRANCO', M, 44);
+  doc.setFont('helvetica','normal'); doc.setFontSize(42); doc.setTextColor(...WHITE);
+  doc.text('Relatório de Análise', M, 128);
+  doc.setFontSize(30); doc.setTextColor(...WINE_MID);
+  doc.text(anoSel!=='todos' ? anoSel : 'Série histórica', M, 144);
+  doc.setFont('helvetica','normal'); doc.setFontSize(13); doc.setTextColor(...DARKMUT);
+  doc.text(`${serLabel} · ${periodoTxt}`, M, 158);
+  doc.setDrawColor(...DARKLINE); doc.setLineWidth(0.3); doc.line(M, 250, RIGHT, 250);
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...WHITE);
+  doc.text('Centro de Assessoria Econômica', M, 261);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...DARKMUT);
+  doc.text('Cid Cordeiro Silva (Economista) · Carolina Cordeiro Silva (Soluções em IA) · Macroanalysis', M, 268);
+
+  // ====================== RESUMO ======================
+  novaPagina();
+  eyebrow('Resumo · '+periodoTxt);
+  tituloSecao('As três séries no período');
+  tabela(
+    ['Série','Admissões','Desligamentos','Saldo','Estoque (fim)'],
+    [
+      ['Base Sindicato Metalúrgicos', fmtN(data.reduce((a,r)=>a+r.adm_b,0)), fmtN(data.reduce((a,r)=>a+r.des_b,0)), fmt(data.reduce((a,r)=>a+r.sal_b,0)), fmtN(data[data.length-1].est_b)],
+      ['Indústria de Transformação', fmtN(data.reduce((a,r)=>a+r.adm_t,0)), fmtN(data.reduce((a,r)=>a+r.des_t,0)), fmt(data.reduce((a,r)=>a+r.sal_t,0)), fmtN(data[data.length-1].est_t)],
+      ['Total dos Municípios', fmtN(data.reduce((a,r)=>a+r.adm_m,0)), fmtN(data.reduce((a,r)=>a+r.des_m,0)), fmt(data.reduce((a,r)=>a+r.sal_m,0)), fmtN(data[data.length-1].est_m)],
+    ],
+    {c0:66, columnStyles:{1:{halign:'right',cellWidth:30},2:{halign:'right',cellWidth:34},3:{halign:'right',cellWidth:24,fontStyle:'bold'},4:{halign:'right',cellWidth:30}}, colorCols:[3]}
+  );
+  diagnostico(`A série ${serLabel} fechou o período com saldo de ${fmt(totSal)} posto${Math.abs(totSal)!==1?'s':''}, resultado de ${fmtN(totAdm)} admissões e ${fmtN(totDes)} desligamentos. O estoque foi de ${fmtN(firstEst)} para ${fmtN(lastEst)} trabalhadores, com ${saldoPos} de ${data.length} ${data.length===1?'mês':'meses'} em saldo positivo.`);
+
+  // Destaques (stat tiles)
+  garantir(26);
+  const tiles=[
+    ['Melhor mês', `${fmt(sal[bestIdx])}`, `${data[bestIdx].mes.toLowerCase()}/${data[bestIdx].ano.slice(2)}`],
+    ['Pior mês', `${fmt(sal[worstIdx])}`, `${data[worstIdx].mes.toLowerCase()}/${data[worstIdx].ano.slice(2)}`],
+    ['Setor destaque', `${fmt(topSetor.ts)}`, topSetor.nome.replace(/^Fabricação de /i,'').slice(0,26)],
+    ['Maior retração', `${fmt(botSetor.ts)}`, botSetor.nome.replace(/^Fabricação de /i,'').slice(0,26)],
+  ];
+  const tw=(CW-3*4)/4;
+  tiles.forEach((t,i)=>{
+    const x=M+i*(tw+4);
+    doc.setFont('courier','normal'); doc.setFontSize(7); doc.setTextColor(...INK3);
+    doc.text(t[0].toUpperCase(), x, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(20);
+    doc.setTextColor(...(t[1].startsWith('-')?WINE:INK));
+    doc.text(t[1], x, y+8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...INK3);
+    doc.text(doc.splitTextToSize(t[2], tw), x, y+13);
   });
-  y = doc.lastAutoTable.finalY + 4;
+  y += 24;
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...WINE);
-  doc.text('ANÁLISE POR SETOR', 15, y);
-  doc.setDrawColor(...WINE);
-  doc.line(15, y+1, 51, y+1);
-  y += 3.5;
-
-  const colX = [15, 108];
-  const colW = 87;
-  const colSetores = [SETORES_RELATORIO.slice(0, 4), SETORES_RELATORIO.slice(4, 8)];
-  const yIniColunas = y;
-  let yFinais = [];
-
-  for (let ci = 0; ci < 2; ci++) {
-    let yL = yIniColunas;
-    const x = colX[ci];
-    for (const s of colSetores[ci]) {
-      const c = r.cats[s.key] || {a:0, d:0, s:0, e:0};
-      const setorOriginal = SETORES.find(x => x.key === s.key);
-      const desc = setorOriginal?.desc || '';
-      const saldoCor = c.s > 0 ? [74,103,65] : c.s < 0 ? WINE : INK3;
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(...INK);
-      const nomeLines = doc.splitTextToSize(s.nome, colW);
-      doc.text(nomeLines, x, yL);
-      yL += nomeLines.length * 2.9 + 0.5;
-
-      doc.setFont('courier', 'bold');
-      doc.setFontSize(6.5);
-      doc.setTextColor(...INK3);
-      const p1 = `Adm:${fmtN(c.a)}  Des:${fmtN(c.d)}  `;
-      doc.text(p1, x, yL);
-      const w1 = doc.getTextWidth(p1);
-      doc.setTextColor(...saldoCor);
-      const p2 = `Saldo:${fmt(c.s)}`;
-      doc.text(p2, x + w1, yL);
-      const w2 = doc.getTextWidth(p2);
-      doc.setTextColor(...INK3);
-      doc.text(`  Est:${fmtN(c.e)}  Var:${fmtPct(variacaoPct(c.s, c.e))}`, x + w1 + w2, yL);
-      yL += 3.2;
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6.8);
-      doc.setTextColor(...INK2);
-      const descLines = doc.splitTextToSize(desc, colW);
-      doc.text(descLines, x, yL);
-      yL += descLines.length * 2.8 + 3;
-    }
-    yFinais.push(yL);
+  // ====================== COMPARATIVO ======================
+  if(comp){
+    garantir(60);
+    eyebrow(`Comparativo ${comp.yPrev} x ${comp.yCur}`);
+    tituloSecao(serLabel);
+    const pct=v=>((v>=0?'+':'')+(v*100).toFixed(1).replace('.',',')+'%');
+    tabela(
+      ['Métrica', comp.yPrev, comp.yCur, 'Variação'],
+      [
+        ['Admissões', fmtN(comp.pAdm), fmtN(comp.cAdm), pct(comp.vAdm)],
+        ['Desligamentos', fmtN(comp.pDes), fmtN(comp.cDes), pct(comp.vDes)],
+        ['Saldo acumulado', fmt(comp.pSal), fmt(comp.cSal), fmt(comp.dSal)+' postos'],
+        ['Estoque (fim)', fmtN(comp.pEst), fmtN(comp.cEst), fmt(comp.dEst)+' postos'],
+      ],
+      {c0:60, columnStyles:{1:{halign:'right',cellWidth:34},2:{halign:'right',cellWidth:34},3:{halign:'right',cellWidth:36}}, colorCols:[3]}
+    );
+    const difTxt = comp.dSal>=0
+      ? `O saldo do período superou ${comp.yPrev} em ${fmtN(Math.abs(comp.dSal))} postos.`
+      : `O saldo ficou ${fmtN(Math.abs(comp.dSal))} postos abaixo de ${comp.yPrev}. O estoque segue ${comp.dEst>=0?'acima':'abaixo'} do ano anterior (${fmt(comp.dEst)}) porque soma o acúmulo dos meses.`;
+    diagnostico(difTxt);
   }
 
-  y = Math.max(...yFinais);
-  rodape();
-  const mesId = r.mes.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  doc.save(`relatorio_sindmetal_pb_${mesId}_${r.ano}.pdf`);
+  // ====================== EVOLUÇÃO MENSAL (série) ======================
+  garantir(40);
+  eyebrow('Evolução mensal');
+  tituloSecao(serLabel);
+  tabela(
+    ['Mês','Admissões','Desligamentos','Saldo','Estoque'],
+    data.map(r=>[`${r.mes}/${r.ano.slice(2)}`, fmtN(r['adm_'+pk]), fmtN(r['des_'+pk]), fmt(r['sal_'+pk]), fmtN(r['est_'+pk])])
+        .concat([['Acumulado', fmtN(totAdm), fmtN(totDes), fmt(totSal), fmtN(lastEst)]]),
+    {c0:40, columnStyles:{1:{halign:'right',cellWidth:38},2:{halign:'right',cellWidth:42},3:{halign:'right',cellWidth:30},4:{halign:'right',cellWidth:35}}, colorCols:[3], boldRows:[data.length], tintRows:[data.length]}
+  );
+
+  // ====================== RELATÓRIO DETALHADO POR MÊS ======================
+  novaPagina();
+  eyebrow('Relatório detalhado por mês');
+  tituloSecao('Totais e os oito grupamentos');
+  y += 1;
+  data.forEach(r=>{
+    garantir(70);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...INK);
+    doc.text(`${r.mes} de ${r.ano}`, M, y); y += 5;
+    const body=[
+      ['Total dos Municípios', fmtN(r.adm_m), fmtN(r.des_m), fmt(r.sal_m), fmtN(r.est_m), fmtPct(variacaoPct(r.sal_m,r.est_m))],
+      ['Total da Indústria de Transformação', fmtN(r.adm_t), fmtN(r.des_t), fmt(r.sal_t), fmtN(r.est_t), fmtPct(variacaoPct(r.sal_t,r.est_t))],
+      ['Total Base Sindicato Metalúrgicos', fmtN(r.adm_b), fmtN(r.des_b), fmt(r.sal_b), fmtN(r.est_b), fmtPct(variacaoPct(r.sal_b,r.est_b))],
+    ];
+    for(const s of SETORES_RELATORIO){ const c=r.cats[s.key]||{a:0,d:0,s:0,e:0}; body.push([s.nome, fmtN(c.a), fmtN(c.d), fmt(c.s), fmtN(c.e), fmtPct(variacaoPct(c.s,c.e))]); }
+    tabela(
+      ['Descrição','Adm','Des','Saldo','Estoque','Var %'], body,
+      {c0:66, columnStyles:{1:{halign:'right',cellWidth:19},2:{halign:'right',cellWidth:22},3:{halign:'right',cellWidth:20},4:{halign:'right',cellWidth:24},5:{halign:'right',cellWidth:23}}, colorCols:[3,5], boldRows:[2], tintRows:[2]}
+    );
+  });
+
+  // ====================== ANÁLISE POR SETOR ======================
+  novaPagina();
+  eyebrow('Análise por setor');
+  tituloSecao('Os oito grupamentos, do maior ao menor saldo');
+  y += 1;
+  setores.forEach((s,idx)=>{
+    garantir(78);
+    doc.setFont('courier','normal'); doc.setFontSize(7.5); doc.setTextColor(...INK3);
+    doc.text(`${idx+1} de ${setores.length}`, M, y); y += 5;
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...INK);
+    const nome=doc.splitTextToSize(s.nome, CW); doc.text(nome, M, y); y += nome.length*5;
+    // número grande + descrição
+    doc.setFont('helvetica','normal'); doc.setFontSize(24); doc.setTextColor(...(s.ts<0?WINE:INK));
+    doc.text(fmt(s.ts), M, y+5);
+    const nw=doc.getTextWidth(fmt(s.ts));
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...INK3);
+    doc.text(`postos no período`, M+nw+4, y+2);
+    doc.text(`${fmtN(s.ta)} adm · ${fmtN(s.td)} des · estoque ${fmtN(s.le)}`, M+nw+4, y+6);
+    y += 11;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...INK2);
+    const dl=doc.splitTextToSize(s.desc, CW); doc.text(dl, M, y); y += dl.length*3.6 + 4;
+    // tabela mensal do setor
+    tabela(
+      ['Mês','Admissões','Desligamentos','Saldo','Estoque'],
+      data.map(r=>{ const c=r.cats[s.key]||{a:0,d:0,s:0,e:0}; return [`${r.mes}/${r.ano.slice(2)}`, fmtN(c.a), fmtN(c.d), fmt(c.s), fmtN(c.e)]; })
+          .concat([['Acumulado', fmtN(s.ta), fmtN(s.td), fmt(s.ts), fmtN(s.le)]]),
+      {c0:40, columnStyles:{1:{halign:'right',cellWidth:38},2:{halign:'right',cellWidth:42},3:{halign:'right',cellWidth:30},4:{halign:'right',cellWidth:35}}, colorCols:[3], boldRows:[data.length], tintRows:[data.length]}
+    );
+  });
+
+  // ====================== CONCLUSÃO ======================
+  garantir(60);
+  eyebrow('Síntese');
+  tituloSecao('O que os números mostram');
+  const pontos=[
+    `A série ${serLabel} fechou o período com ${fmt(totSal)} postos e estoque de ${fmtN(lastEst)}, com ${saldoPos} de ${data.length} ${data.length===1?'mês':'meses'} em saldo positivo.`,
+    comp ? `Frente a ${comp.yPrev}, o saldo ${comp.dSal>=0?'subiu':'caiu'} ${fmtN(Math.abs(comp.dSal))} postos; o estoque está ${fmtN(Math.abs(comp.dEst))} postos ${comp.dEst>=0?'acima':'abaixo'} do ano anterior.` : `O melhor mês foi ${data[bestIdx].mes.toLowerCase()}/${data[bestIdx].ano.slice(2)} (${fmt(sal[bestIdx])}) e o pior foi ${data[worstIdx].mes.toLowerCase()}/${data[worstIdx].ano.slice(2)} (${fmt(sal[worstIdx])}).`,
+    `Maior saldo entre os grupamentos: ${topSetor.nome} (${fmt(topSetor.ts)}). Maior retração: ${botSetor.nome} (${fmt(botSetor.ts)}).`,
+  ];
+  pontos.forEach((p,i)=>{
+    const linhas=doc.splitTextToSize(p, CW-8);
+    garantir(linhas.length*3.8+3);
+    doc.setFont('courier','normal'); doc.setFontSize(8); doc.setTextColor(...WINE);
+    doc.text(String(i+1).padStart(2,'0'), M, y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...INK);
+    doc.text(linhas, M+8, y); y += linhas.length*3.8 + 4;
+  });
+
+  // ---------- rodapé em todas as páginas de conteúdo ----------
+  const nP = doc.internal.getNumberOfPages();
+  for(let i=2;i<=nP;i++){
+    doc.setPage(i);
+    doc.setDrawColor(...LINE); doc.setLineWidth(0.2); doc.line(M, 285, RIGHT, 285);
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...MUTED);
+    doc.text(`Sindmetal Pato Branco · Relatório de Análise · ${periodoTxt}`, M, 289);
+    doc.text(`Página ${i}`, RIGHT, 289, {align:'right'});
+    // cabeçalho corrido discreto
+    doc.setFont('courier','bold'); doc.setFontSize(7); doc.setTextColor(...INK3);
+    doc.text('MACROANALYSIS', M, 14);
+    doc.setDrawColor(...WINE); doc.setLineWidth(0.4); doc.line(M, 17, M+22, 17);
+  }
+
+  const slug = periodoTxt.replace(/[^0-9a-z]+/gi,'_').replace(/^_|_$/g,'').toLowerCase();
+  doc.save(`relatorio_analise_sindmetal_pb_${slug}.pdf`);
 }
 
 document.getElementById('ftYear').textContent = new Date().getFullYear();
